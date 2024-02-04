@@ -4,15 +4,10 @@
  * docs.google.com/spreadsheets/d/19UtK7xG2c-ehxdlhCFKMpM4_IHSG-EXFgXLJaunE79I
  */
 
-
-
-
-
-
 // STAT NAME		ZETTER VALUE   BASECAST RANGE   NOTES
 
 // Physical size
-char_height         = 64;       //                  not zetterburn's. this is just cosmetic anyway
+char_height         = 44;       //                  not zetterburn's. this is just cosmetic anyway
 knockback_adj       = 1;		// 0.9  -  1.2
 
 // Ground movement
@@ -26,7 +21,7 @@ dash_turn_time      = 10;		// 8    -  20
 dash_turn_accel     = 1.5;		// 0.1  -  2
 dash_stop_time      = 4;		// 4    -  6
 dash_stop_percent   = 0.35;		// 0.25 -  0.5
-ground_friction     = 0.6;		// 0.3  -  1
+ground_friction     = 1;		// 0.3  -  1
 moonwalk_accel      = 1.3;		// 1.2  -  1.4
     
 // Air movement
@@ -44,7 +39,7 @@ hitstun_grav        = 0.5;		// 0.45 -  0.53
 
 // Jumps
 jump_start_time     = 5;		// 5                this stat is automatically decreased by 1 after init.gml (dan moment), so its "real value" is 4. if you change this during a match, 4 is the value you should reset it to
-jump_speed          = 9.5;		// 7.6  -  12       okay, zetter's is actually 10.99 but... come on
+jump_speed          = 9;		// 7.6  -  12       okay, zetter's is actually 10.99 but... come on
 short_hop_speed     = 5;		// 4    -  7.4
 djump_speed         = 10;		// 6    -  12       absa's is -1 because of her floaty djump
 djump_accel         = 0;        // -1.4 -  0        absa's is -1.4, all other chars are 0. only works if the   djump_accel_end_time   variable is also set. floaty djumps should be adjusted by feel based on your char's gravity
@@ -61,11 +56,11 @@ roll_forward_max    = 9;        // 9    -  11
 roll_backward_max   = 9;        // 9    -  11       always the same as forward
 wave_land_time      = 8;		// 6    -  12
 wave_land_adj       = 1.3;		// 1.2  -  1.5      idk what zetterburn's is
-if has_rune("A") {
-air_dodge_speed     = 16; 
+if has_rune("C") {
+    air_dodge_speed     = 16;      // 7.5  -  8
 }
 else {
-air_dodge_speed     = 8;        // 7.5   - 8
+    air_dodge_speed     = 8;
 }
 techroll_speed      = 10;       // 8    -  11
 
@@ -164,37 +159,27 @@ bubble_y = 8;
 //  Ability init
 //
 
-
-// Ultimate
-ult_charge = 3600;
-ult_cost = 3600; // 2 minutes //Cost accounts for passive ultimate charge. 60 frames * 60 seconds * "X" minutes = time it takes to generate ultimate passively
-
-
-// Barrier
-barrier_timer = 0;
-barrier_rate = 240; //default
-if has_rune("O") && !has_rune("F") {  barrier_rate = 360; } //circular barrier but not placable
-if !has_rune("O") && has_rune("F") {  barrier_rate = 240; } //not circular barrier but placable
-if has_rune("O") && has_rune("F") {  barrier_rate = 480; } //circular barrier and placable
-
-
-barrier_placing = false;
+// // Barrier
+// barrier_timer = 0;
+// barrier_rate = 240;
 
 // Weapon
-max_ammo = 600;
+max_ammo = 360;
 ammo = max_ammo;
 weapon_aim = 0;
-aim_accel = 0.25;    // The higher it is, the faster the acceleration
-aim_decel = 0.5;    // The higher it is, the smoother the deceleration
+aim_accel = 0.3;
+aim_decel = 0.6;
 aim_speed = 1;
 angle_allowance = 2;
 max_aim_speed = 10;
 
 // Beam
 beam_target = noone;
-beam_list = [];     //List of eligble targets for beam
-beam_chip = 0;        //Increments until hitting a damage threshold
 beam_length = 0;
+beam_range = 32*12;
+beam_preview_range = beam_range;
+beam_max_range = beam_range + 96;
+beam_lock_time = 60;
 beam_timer = 0;
 beam_x = 0;
 beam_x_max = 0;
@@ -202,88 +187,56 @@ beam_y = 0;
 beam_y_max = 0;
 weapon_x = 0;
 weapon_y = 0;
-arm_offset_x = 8;
-arm_offset_y = 33;
+arm_offset_x = 6;
+arm_offset_y = 35;
 beam_offset = 40;//24
 o_dist = 0;
-o_angle = 0;    
-charge = 0;     //current beam charge
-
-if has_rune("G") { // Stick beam
-beam_range = 32*12;
-beam_preview_range = beam_range;
-beam_max_range = beam_range + 96;
-beam_lock_time = 60;
-charge_decay = 1;
-charge_2 = 30;                      // Charge cost for level 2 / how many frames until charge 2
-charge_3 = charge_2 + 60;           // Charge cost for level 3 / how many frames until charge 3
-charge_max = charge_3 + 15;        // Maximum charge points held
-beam_chip_1 = 10;      // How many ticks does it take to deal damage
-beam_chip_2 = 6;      // How many ticks does it take to deal damage
-beam_chip_3 = 1;      // How many ticks does it take to deal damage
-}
-if !has_rune("G") { // Lock on
-beam_range = 32*4;
-beam_preview_range = beam_range;
-beam_max_range = beam_range+32;
-beam_lock_time = 60;
-charge_decay = 1;
-charge_2 = 60;                      // Charge cost for level 2 / how many frames until charge 2
-charge_3 = charge_2 + 120;           // Charge cost for level 3 / how many frames until charge 3
+o_angle = 0;
+charge = 0;
+charge_decay = 0.5;
+charge_2 = 45;                      // Charge cost for level 2 / how many frames until charge 2
+charge_3 = charge_2 + 90;           // Charge cost for level 3 / how many frames until charge 3
 charge_max = charge_3 + 30;        // Maximum charge points held
+beam_list = [];
+beam_chip = 0;        //Increments until hitting a damage threshold
+
 beam_chip_1 = 10;      // How many ticks does it take to deal damage
 beam_chip_2 = 6;      // How many ticks does it take to deal damage
-beam_chip_3 = 1;      // How many ticks does it take to deal damage
-}
+beam_chip_3 = 3;      // How many ticks does it take to deal damage
 beam_chip_threshold = beam_chip_1;
 
-
 // Orbs
-orb_cost = 100;
-miniorb_cost = 25;
-orb_speed = 6;
-orb_h = 0;
-orb_v = 0;
+orb_out = 0;
+orb_cost = ammo/3;
+miniorb_cost = ammo/6;
 
-// Sentry Turrets
-sentry = noone;
-turrets = [];
-turret_timer = 0;
-if has_rune("I") && !has_rune("F") {turret_rate = 60*5;} // shorter cooldown for aerial turrets that can't be placed
-else {turret_rate = 60*8;}
-turret_placing = false; //if has_rune("F") {}
-
-if has_rune ("E") { max_turrets = 1; turret_charges = max_turrets;}
-else {max_turrets = 3; turret_charges = max_turrets;}
-
-orig_dash_speed = dash_speed;
+// construct
+construct = noone;
+constructs = [];
+if has_rune("A") {  max_constructs = 2;} else { max_constructs = 1;}
+constructs_available = max_constructs;
+max_constructs_placed = 1;
+construct_timer = 0;
+construct_rate = 360;   //480
+construct_rate2 = 240;
+construct_speed = 2;
+construct_type = 0;     // 0 = static horizontal lower, 1 = dynamic horizontal lower left, 2 = dynamic horizontal lower right, 3 = static horizontal upper,
+construct_direction = 0;
 
 // Teleporter
 teleporters = [];
 teleporter_entrance = noone;
 teleporter_exit = noone;
-teleporter_ultimate = noone;
-tp_x = x;
-tp_xv = 0;
-tp_y = y;
-tp_yv = 0;
 tp_timer = 0;
-tp_rate = 480;
+tp_rate = 480; //480
 tp_tp_timer = 0;
 tp_interval = 30;
-tp_team = []; // Array of dead teammates who can respawn
-tp_subject = noone;
-tp_slide_step = 0;
-tp_slide = 0;
-tp_slide_length = 120;
-
-
-// Effects
-cfx_beam_fire = hit_fx_create(sprite_get("cfx_beam_fire"), 8);
-turret_heal_effect = sprite_get("cfx_heal");
-turret_damage_effect = sprite_get("cfx_sentry_fire");
 
 // Teleport Color
+sym_r2 = get_color_profile_slot_r(get_player_color(player),2);
+sym_g2 = get_color_profile_slot_g(get_player_color(player),2);
+sym_b2 = get_color_profile_slot_b(get_player_color(player),2);
+
 sym_r1 = get_color_profile_slot_r(get_player_color(player),1);
 sym_g1 = get_color_profile_slot_g(get_player_color(player),1);
 sym_b1 = get_color_profile_slot_b(get_player_color(player),1);
@@ -294,14 +247,26 @@ sym_g0 = get_color_profile_slot_g(get_player_color(player),0);
 sym_b0 = get_color_profile_slot_b(get_player_color(player),0);
 
 
+
+// Stage
+// stage_x = get_stage_data( SD_X_POS );
+// stage_y = get_stage_data( SD_Y_POS );
+
+
+
+
 // Kirby Support
 kirbyability = 16;
 newicon = 0;
 swallowed = 0;
 enemykirby = noone;
 
+// Teammate platform
+plat_ = 0;
+plat_timer = 0;
+plat_interval = 120;
 
-
+// sym_c = merge_color(make_color_rgb(sym_r,sym_g,sym_b), c_white, 0);
 // Muno template: (don't change)
 
 //user_event(14); // General init

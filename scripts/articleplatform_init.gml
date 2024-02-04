@@ -1,12 +1,16 @@
-// articleplatform_init 
-// Solid PLatform
+// articleplatform_init
 
-//Sprite and direction
-sprite_index = sprite_get("pb_plat");
+
+sprite_index = asset_get("empty_sprite");
 mask_index = -1;
-orig_player_id = player_id;
-for_player = noone;
+
 uses_shader = true;
 state_timer = 0;
 state = 0;
-anim_speed = 0.2;
+anim_speed = 0.05;
+
+orig_player_id = player_id;
+for_player = noone;
+
+lifetime = 0;
+construct_direction = player_id.construct_direction;

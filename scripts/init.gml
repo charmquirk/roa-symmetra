@@ -11,6 +11,25 @@
 
 // STAT NAME		ZETTER VALUE   BASECAST RANGE   NOTES
 
+// Runes
+has_rune_remote_place   = has_rune("A")
+has_rune_more_turrets   = has_rune("B")
+has_rune_turret_proj    = has_rune("C")
+has_rune_beam_lock_on   = has_rune("D")
+has_rune_beam_lifesteal = has_rune("E")
+has_rune_shield_health  = has_rune("F")
+has_rune_tp_exit        = has_rune("G")
+has_rune_tp_airborne    = has_rune("H")
+has_rune_orb_scaling    = has_rune("I")
+has_rune_beam_heal      = has_rune("J")
+has_rune_long_dodge     = has_rune("K")
+has_rune_spawn_point    = has_rune("L")
+has_rune_shield_wall    = has_rune("M")
+has_rune_shield_gen     = has_rune("N")
+has_rune_turret_heal    = has_rune("O")
+
+
+
 // Physical size
 char_height         = 64;       //                  not zetterburn's. this is just cosmetic anyway
 knockback_adj       = 1;		// 0.9  -  1.2

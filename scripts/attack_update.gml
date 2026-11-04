@@ -720,3 +720,7 @@ if (attack == AT_NSPECIAL || attack == AT_JAB || attack == AT_DSPECIAL || attack
 // // with (scan_objects(index, obj1, obj_2, obj_3))
 
 // return argument[argument[0] + 1];
+
+// #define is_teammate
+// is_teammate(my_player, other_player)
+// return my_player != other_player && get_player_team(my_player) != get_player_team(other_player);

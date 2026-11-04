@@ -324,3 +324,5 @@ enemykirby = noone;
 // Muno template: (don't change)
 
 //user_event(14); // General init
+#define is_fighting()
+is_fighting() {return state != PS_DEAD  && state != PS_SPAWN && state != PS_RESPAWN;}

@@ -1,6 +1,6 @@
 //update.gml
 //Ultimate charge
-if has_rune("L") && state != PS_DEAD  && state != PS_SPAWN && state != PS_RESPAWN && ult_charge < ult_cost && !instance_exists(teleporter_ultimate) { //if not dead or spawning //
+if has_rune("L") && is_fighting && ult_charge < ult_cost && !instance_exists(teleporter_ultimate) { //if not dead or spawning //
 	ult_charge++;//passively generate ultimate charge
 }
 

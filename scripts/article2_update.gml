@@ -22,7 +22,7 @@ if state == 0 { //if not deploying or destroyed
 	}
 }
 
-if ("tp_health" in self) && tp_health >= tp_max_health {
+if ("health" in self) && health >= health_max {
     state = 1;
     state_timer = 0;
     damage_cd = 0; //reset damage cooldown
@@ -51,9 +51,8 @@ if state != 1 {
             }
             break;
         case "ultimate" :
-        	tp_max_health = 120;
+        	health_max = 120;
         	vsp = grav;
-        	mask_index = sprite_get("teleporter_pad_minimask");
         	break;
     }
 }
@@ -78,7 +77,7 @@ switch(state) {
     case 0 :    //Default 
         if free { vsp = 8;}
         // if type == "entrance" || type == "exit" {sprite_index = sprite_get("teleporter_pad");}
-        sprite_index = sprite_get("teleporter_pad");
+        sprite_index = sprite_get("deployable");
         
         // if state_timer >= lifetime { //TP expires
         //     state = 1;
@@ -86,7 +85,7 @@ switch(state) {
         // }
         break;
     case 1 :    //Destruction
-        spawn_hit_fx(x,y-32,HFX_GEN_OMNI);
+        spawn_hit_fx(x, y-32, HFX_GEN_OMNI);
         if type == "ultimate" {sound_play(sound_get("teleporter destroyed"));}
         
         switch(type) {
@@ -103,7 +102,5 @@ switch(state) {
         exit;
         break;
 }
-
-
 
 state_timer++;

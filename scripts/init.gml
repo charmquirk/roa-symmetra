@@ -80,12 +80,7 @@ roll_forward_max    = 9;        // 9    -  11
 roll_backward_max   = 9;        // 9    -  11       always the same as forward
 wave_land_time      = 8;		// 6    -  12
 wave_land_adj       = 1.3;		// 1.2  -  1.5      idk what zetterburn's is
-if has_rune("A") {
-air_dodge_speed     = 16; 
-}
-else {
-air_dodge_speed     = 8;        // 7.5   - 8
-}
+air_dodge_speed     = has_rune_long_dodge ? 16 : 8; // 7.5   - 8
 techroll_speed      = 10;       // 8    -  11
 
 
@@ -175,10 +170,6 @@ air_dodge_sound     = asset_get("sfx_quick_dodge");
 bubble_x = 0;
 bubble_y = 8;
 
-
-
-
-
 //
 //  Ability init
 //
@@ -187,16 +178,15 @@ bubble_y = 8;
 // Ultimate
 ult_charge = 3600;
 ult_cost = 3600; // 2 minutes //Cost accounts for passive ultimate charge. 60 frames * 60 seconds * "X" minutes = time it takes to generate ultimate passively
-
+ult_sprite_foreground = "";
+if has_rune_spawn_point {ult_sprite_foreground = "ultimate_spawn_point";}
+if has_rune_shield_wall {ult_sprite_foreground = "ultimate_shield_wall";}
+if has_rune_shield_gen {ult_sprite_foreground = "ultimate_shield_gen";}
+ult_sprite_background = "ultimate_background"
 
 // Barrier
 barrier_timer = 0;
-barrier_rate = 240; //default
-if has_rune("O") && !has_rune("F") {  barrier_rate = 360; } //circular barrier but not placable
-if !has_rune("O") && has_rune("F") {  barrier_rate = 240; } //not circular barrier but placable
-if has_rune("O") && has_rune("F") {  barrier_rate = 480; } //circular barrier and placable
-
-
+barrier_rate = 240; //default lifetime
 barrier_placing = false;
 
 // Weapon
@@ -227,22 +217,7 @@ beam_offset = 40;//24
 o_dist = 0;
 o_angle = 0;    
 charge = 0;     //current beam charge
-
-if has_rune("G") { // Stick beam
-beam_range = 32*12;
-beam_preview_range = beam_range;
-beam_max_range = beam_range + 96;
-beam_lock_time = 60;
-charge_decay = 1;
-charge_2 = 30;                      // Charge cost for level 2 / how many frames until charge 2
-charge_3 = charge_2 + 60;           // Charge cost for level 3 / how many frames until charge 3
-charge_max = charge_3 + 15;        // Maximum charge points held
-beam_chip_1 = 10;      // How many ticks does it take to deal damage
-beam_chip_2 = 6;      // How many ticks does it take to deal damage
-beam_chip_3 = 1;      // How many ticks does it take to deal damage
-}
-if !has_rune("G") { // Lock on
-beam_range = 32*4;
+beam_range = has_rune_beam_lock_on ? 32*4 : 32*12;
 beam_preview_range = beam_range;
 beam_max_range = beam_range+32;
 beam_lock_time = 60;
@@ -253,7 +228,6 @@ charge_max = charge_3 + 30;        // Maximum charge points held
 beam_chip_1 = 10;      // How many ticks does it take to deal damage
 beam_chip_2 = 6;      // How many ticks does it take to deal damage
 beam_chip_3 = 1;      // How many ticks does it take to deal damage
-}
 beam_chip_threshold = beam_chip_1;
 
 
@@ -268,12 +242,15 @@ orb_v = 0;
 sentry = noone;
 turrets = [];
 turret_timer = 0;
-if has_rune("I") && !has_rune("F") {turret_rate = 60*5;} // shorter cooldown for aerial turrets that can't be placed
-else {turret_rate = 60*8;}
-turret_placing = false; //if has_rune("F") {}
+turret_rate = 60*8;
+turret_placing = false;
+max_turrets = has_rune_more_turrets ? 3 : 1;
+turret_charges = max_turrets;
+dspecial_hud_sprite_inactive = has_rune_turret_heal ? "ability_sentryturret_healing" : "ability_sentryturret";
+dspecial_hud_sprite_active = has_rune_turret_heal ? "ability_sentryturret_healing_active" : "ability_sentryturret_active";
+dspecial_hud_sprite_cooldown = has_rune_turret_heal ? "ability_sentryturret_healing_cooldown" : "ability_sentryturret_cooldown";
 
-if has_rune ("E") { max_turrets = 1; turret_charges = max_turrets;}
-else {max_turrets = 3; turret_charges = max_turrets;}
+
 
 orig_dash_speed = dash_speed;
 
@@ -290,7 +267,7 @@ tp_timer = 0;
 tp_rate = 480;
 tp_tp_timer = 0;
 tp_interval = 30;
-tp_team = []; // Array of dead teammates who can respawn
+dead_teammates = []; // Array of dead teammates who can respawn
 tp_subject = noone;
 tp_slide_step = 0;
 tp_slide = 0;

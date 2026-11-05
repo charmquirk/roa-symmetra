@@ -40,7 +40,7 @@ switch(attack) {
 				break;
             case 2:
             	if !instance_exists(teleporter_ultimate) {
-            		teleporter_ultimate = instance_create(x,y,"obj_article2");
+            		teleporter_ultimate = instance_create(x, y, "obj_article2");
                     teleporter_ultimate.type = "ultimate";
                     teleporter_ultimate.state = -1;
             	}
@@ -626,58 +626,35 @@ switch(attack) {
     
     case AT_DSPECIAL :
         switch(window) {
-        	case 1 : //start
-        		if !has_rune_more_turrets { //if you can only have one turret
-        			if instance_exists(sentry) && window_timer == 1{
-        				sentry.state = 2; //destroy turret
-        				turret_timer += turret_rate;
-        				move_cooldown[AT_DSPECIAL] = 12;
-        			}
+        	case 1 : 
+        		// Delete old turrets if possible
+        		for (k = 0; k < array_length(turrets); k++;) {
+			        if k >= (array_length(turrets) - max_turrets) {
+			            var extra_turret = turrets[k];
+			            if extra_turret != noone {
+			                extra_turret.state = 2;
+			                extra_turret.state_timer = 0;
+			            }
+			        }
+			    	break;
         		}
+        		if !has_rune_more_turrets { move_cooldown[AT_DSPECIAL] = 12; }
         		break;
+        	
             case 2: //deploy
-                if (turret_charges > 0 && turret_timer <= turret_rate*(max_turrets-turret_charges) && turret_placing == false) { // if there are charges, and it sthe beginning of the windo and timer is below
-                	if has_rune("I") { //Aerial flying Turrets
-            			sentry = instance_create(x, y - char_height/2 - 18, "obj_article3");
-            			sentry.flying_dir = spr_dir;
-            			sentry.hsp = sentry.max_flying_speed*sentry.flying_dir;
-            			sentry.damage_cd = 0;
-            			if has_rune_more_turrets { //if you can have more than 1 turret
-							array_push(turrets, sentry);
-            			}
-            			if (!has_rune_more_turrets && !has_rune("F")) || has_rune_more_turrets { //if you only have one turret max, it flies, and can't be placed OR if you can have multiple turrets
-            				turret_timer += turret_rate; //start cooldown immediately
-            				move_cooldown[AT_DSPECIAL] = 12; //Cooldown before placing next turret
-						}
-                    	sound_play(sound_get("preview"));
-                    	turret_charges--;
-                    	turret_placing = true;
-                	}
-                }
-                if !special_down { //release special
-                	if has_rune("I") && has_rune_remote_place && instance_exists(sentry) { sentry.hsp = 0; }//Aerial turrets and stop objects
-                    window = 3;
-                    window_timer = 0;
-                }
-                invisible = true;
                 break;
+            
             case 3: //end
-            	turret_placing = false;
             	if (turret_charges > 0 && window_timer == 1) {
-            		
-            		if !has_rune("I") { // Stationary turrets
-            			if free { sentry = instance_create(x, y-char_height/2, "obj_article3"); }
-            			else { sentry = instance_create(x, y-18, "obj_article3"); sentry.can_be_grounded = true;}
-            			sentry.damage_cd = 0;
-            			if has_rune_more_turrets { //if you have multiple turrets
-            				array_push(turrets, sentry);
-                    		turret_timer += turret_rate;
-            			}
-            			// print_debug("Placed");
-            			turret_charges--;
-                    	move_cooldown[AT_DSPECIAL] = 12; //Cooldown before placing next turret
-						sound_play(sound_get("preview"));
-            		}
+            		var turret_y_offset = free ? y-char_height/2 : y-18;
+            		sentry = instance_create(x, turret_y_offset, "obj_article3");
+            		sentry.can_be_grounded = !free;
+            		sentry.is_healing = has_rune_turret_heal;
+            		sentry.is_weak_turret = has_rune_more_turrets;
+            		array_push(turrets, sentry);
+            		turret_timer += turret_rate;
+        			turret_charges--;
+                	move_cooldown[AT_DSPECIAL] = 12; //Cooldown before placing next turret
 			    }
                 break;
 		}

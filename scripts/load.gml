@@ -51,16 +51,26 @@ sprite_change_offset("jab_aiming", 16, 9);
 sprite_change_offset("jab_arm", 6, 13);
 sprite_change_offset("jab_arm_white", 6, 11);
 
-sprite_change_offset("teleporter_pad_preview", 31, 76);
-sprite_change_offset("teleporter_ultimate_preview", 31, 76);
-sprite_change_offset("teleporter_portal", 31, 76);
-sprite_change_offset("teleporter_hologram", 63, 140);
-sprite_change_offset("teleporter_pad", 31, 76);
-sprite_change_offset("teleporter_pad_mask", 31, 76);
-sprite_change_offset("teleporter_pad_minimask", 31, 76);
-sprite_change_offset("teleporter_healthbar", 41, 5);
-sprite_change_offset("healthbar", 0, 3);
 
+sprite_change_offset("healthbar", 0, 5);
+
+
+// Deployable   -   Teleporter, Spawn Point, Shield Generator
+sprite_change_offset("deployable", 31, 76);
+sprite_change_offset("deployable_healthbar", 41, 5);
+sprite_change_offset("deployable_mask", 31, 76);
+
+// Teleporter
+sprite_change_offset("teleporter_mask", 31, 76);
+sprite_change_offset("teleporter_portal", 31, 76);
+sprite_change_offset("teleporter_preview", 31, 76);
+
+// Spawn Point Ultimate
+sprite_change_offset("spawn_point_preview", 31, 76);
+sprite_change_offset("spawn_point_hologram", 63, 140);
+
+
+// Beam
 sprite_change_offset("beam_tip", 31, 31);
 sprite_change_offset("cfx_beam_fire", 31, 31);
 sprite_change_offset("cfx_heal", 15, 15);
@@ -68,6 +78,7 @@ sprite_change_offset("beam_w1", 0, 3);
 sprite_change_offset("beam_w2", 0, 4);
 sprite_change_offset("beam_w4", 0, 6);
 
+// Sentry Turret
 sprite_change_offset("sentry_deactivated", 15, 15);
 sprite_change_offset("sentry_inactive", 15, 15);
 sprite_change_offset("sentry_active", 15, 15);
@@ -83,10 +94,11 @@ sprite_change_offset("sentry_healthbar", 21, 5);
 sprite_change_offset("sentry_tip", 31, 31);
 sprite_change_offset("cfx_sentry_fire", 15, 15);
 
-
+// Barrier
 sprite_change_offset("barrier", 16, 64);
 sprite_change_offset("barrier2", 64, 64);
 
+// Orb
 sprite_change_offset("orb_uncharged", 16, 16);
 sprite_change_offset("orb_charged", 16, 16);
 sprite_change_offset("orb_mask", 16, 16);

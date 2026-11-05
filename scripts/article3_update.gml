@@ -1,5 +1,7 @@
 //article3_update
 
+if !("state" in self) { exit;}
+
 if state == 0 || state == 1 {
 	if free {
     	sprite_index = sprite_get("sentry_aerial");           
@@ -35,20 +37,20 @@ else {
 
 
 if sentry_target == noone && state == 0 {
-    sentry_chip = 0;
+    chip_damage = 0;
     
-    if has_rune("H") {
-        with player_id {        // Target yourself
-            other.t_dist = point_distance(x, y-char_height/2, other.x, other.y);		// Distance between target and player       
-            if other.t_dist <= other.sentry_range {
-                other.state = 1;
-                other.sentry_target = id;
-            }
-        }
-    }
+    // if has_rune_turret_heal {
+    //     with player_id {        // Target yourself
+    //         other.t_dist = point_distance(x, y-char_height/2, other.x, other.y);		// Distance between target and player       
+    //         if other.t_dist <= other.sentry_range {
+    //             other.state = 1;
+    //             other.sentry_target = id;
+    //         }
+    //     }
+    // }
     
     if sentry_target == noone {
-        if has_rune("H") {
+        if has_rune_turret_heal {
             with oPlayer {          // Target teammates
                 if (id != other.player_id && get_player_team(player) == get_player_team(other.player_id.player)) {
                     other.t_dist = point_distance(x, y-char_height/2, other.x, other.y);		// Distance between target and player 
@@ -79,7 +81,7 @@ if sentry_target != noone {
 		state = 0;
 	}
 	else {
-    if has_rune("H") { //healing turret
+    if has_rune_turret_heal { //healing turret
         with sentry_target {
             other.t_dist = point_distance(x, y-char_height/2, other.x, other.y);		// Distance between target and player
             other.t_ang = point_direction(other.x, other.y, x, y-char_height/2);

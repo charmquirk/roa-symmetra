@@ -1,85 +1,48 @@
 //update.gml
+
+
+// Long dodge
+if has_rune_long_dodge && (state == PS_AIR_DODGE || state == PS_WAVELAND) {draw_indicator = false;}
+//invisible = true; init_shader();
+// else {  outline_color = [0,0,0];}outline_color = [sym_r0,sym_g0,sym_b0];
+
+
 //Ultimate charge
 if has_rune("L") && is_fighting && ult_charge < ult_cost && !instance_exists(teleporter_ultimate) { //if not dead or spawning //
 	ult_charge++;//passively generate ultimate charge
 }
 
 
-if has_rune("A") && (state == PS_AIR_DODGE || state == PS_WAVELAND){draw_indicator = false;}//invisible = true; init_shader();
-// else {  outline_color = [0,0,0];}outline_color = [sym_r0,sym_g0,sym_b0];
-
-
-if (barrier_timer > 0) {  barrier_timer--;  }       // Barrier cooldown system
-if (("tp_timer" in self) && tp_timer > 0) {  tp_timer--;  }     // Teleporter cooldown system
-if (("turret_timer" in self) && turret_timer > 0) { turret_timer--; }     // Turret cooldown system
+// Cooldown Timers
+if (barrier_timer > 0) {  barrier_timer--;  }
+if (tp_timer > 0) {  tp_timer--;  }
+if (turret_timer > 0) { turret_timer--; }
 
 
 // Regenerate charges for turrets if max charges hasn't been reached
-if ("turret_charges" in self) && (turret_charges < max_turrets) {
-	if (max_turrets > 1) {
-    	if (turret_timer == turret_rate*(max_turrets-turret_charges-1)){ //if timer ends
- 	    	turret_charges++; //create a charge
- 		}
-   
-    	// If the turret timer is less than required to meet max turrets, increase timer
-		if (turret_timer < turret_rate*(max_turrets-turret_charges-1)) {
-        	turret_timer += turret_rate;
-    	}
-	}
-	else {
-		if (turret_timer == 0 && !instance_exists(sentry)){ //if timer ends
- 	    	turret_charges++; //create a charge
- 		}
-	}
+if (turret_charges < max_turrets) {
+	var refresh_time = turret_rate * (max_turrets - turret_charges - 1);
+	if (turret_timer >= refresh_time){	// If the timer reaches 0
+     	turret_charges++;				// Create a charge
+ 	}
+ 	else { // If the turret timer is less than required to meet max turrets, increase timer
+ 		turret_timer += turret_rate;
+ 	}
 }
 
-if !has_rune("E") { //if you can have multiple turrets
-// Check for empty spaces in turret array
-if ("turrets" in self) && array_length(turrets) > 0 {
+
+// Shrink array to remove gaps.
+if array_length(turrets) > 0 {
+	var new_turret_array = [];
     for (i = 0; i < array_length(turrets); i++;) {  //Start at first index and oldest turret
-        if turrets[i] == noone && i < array_length(turrets) {     // If current position empty
-            if array_length(turrets) == 1 {         // If array only has one empty slot
-                turrets = [];   // Reset array
-                break;
-            }
-            if array_length(turrets) > 1 {      // If array has many turrets
-                if i == 0 || i == (array_length(turrets) - 1)  {      // If on either end of the array
-                    if i == 0 {         // If first in array and oldest turret
-                        turrets = array_slice(turrets, 1, array_length(turrets)-1); // Shorten and cut out first index.
-                        i--;    //Restart next iteration at the same position which will have the new value
-                    }
-                    if i == (array_length(turrets) - 1) {     // If last in array and most recent turret
-                        turrets = array_slice(turrets, 0, i);   // Shorten and cut out last index.
-                    }
-                }
-                else {      // If in the middle of the array
-                    if turrets[i+1] != noone && (i+1) < array_length(turrets) {    // If there is a next value in the array
-                        turrets[i] = turrets[i+1];
-                        turrets[i+1] = noone;
-                        i--;    //Restart next iteration at the same position which will have the new value
-                    }
-                }
-            }
-        }
-    }    
-}
-
-// If maximum turrets are placed, destroy the oldest turret
-if ("turrets" in self) && array_length(turrets) > max_turrets {
-    for (k = 0; k < array_length(turrets); k++;) {
-        if k < (array_length(turrets) - max_turrets) {
-            var cur_tur = turrets[k];
-            if cur_tur != noone {
-                cur_tur.state = 2;     // Delete turret
-                cur_tur.state_timer = 0;
-            }
-            else {
-                // turrets = array_slice(turrets, 1, array_length(turrets) - 1);     // Cut first turret out of the array
-                // break;
-            }
-        }
+    	if turrets[i] != noone {
+    		array_push(new_turret_array,turrets[i]);
+    	}
     }
-}
+    if !array_equals(turrets, new_turret_array) {
+	    turrets = [];
+	    turrets = array_clone(new_turret_array);
+    }
 }
 
 
@@ -145,7 +108,7 @@ if attack == AT_USPECIAL {
     		if !right_down && !left_down { teleporter_exit.vsp = teleporter_exit.grav; }	//gravity
     		if teleporter_exit.tp_yv != 0 {	teleporter_exit.tp_yv = teleporter_exit.tp_yv * teleporter_exit.accel;	}
 		}
-		if teleporter_exit.tp_yv != 0 {teleporter_exit.vsp = clamp(teleporter_exit.vsp, -teleporter_exit.max_vsp, teleporter_exit.max_vsp);}
+		if teleporter_exit.tp_yv != 0 {teleporter_exit.vsp = clamp(teleporter_exit.vsp, -teleporter_exit.vsp_max, teleporter_exit.vsp_max);}
 		teleporter_exit.y += teleporter_exit.tp_yv;
 		teleporter_exit.y = round(teleporter_exit.y);
 		// if (up_pressed || down_pressed ) {
@@ -256,104 +219,63 @@ if (state == PS_HITSTUN || state == PS_HITSTUN_LAND || state == PS_TUMBLE || sta
 
 
 
-// Teleporter ultimate
-if instance_exists(teleporter_ultimate) { //If teleporter exists and its not yours
-if array_length(tp_team) == 0 {	array_push(tp_team, id);}
-if array_length(tp_team) > 0 {
-	tp_slide_step++;
-	// print("Step " + string(tp_slide_step));
-	if tp_slide_step >= tp_slide_length {
-		tp_slide_step = 0; //reset steps
-		tp_slide++; //display next teammate
-		// print("Slide " + string(tp_slide));
+// Spawn Point ultimate
+if instance_exists(teleporter_ultimate) {
+	
+	// Find all dead teammates
+	with oPlayer {
+		if get_player_team(player) == get_player_team(other.player) && state == PS_DEAD {
+			if array_find_index(other.dead_teammates, id) == -1 {array_push(other.dead_teammates, id)} // Add dead player to the array.
+		}
+	}
+	
+	var new_teammate_array = [];
+	with dead_teammates {
+		// Give dead players another stock
+        var current_stocks = get_player_stocks(id);
+        if current_stocks <= 0 {set_player_stocks(id, 1);}
+        
+        // Respawn the dead players
+        set_state(PS_RESPAWN);
+        x = other.teleporter_ultimate.x;
+        y = other.teleporter_ultimate.y - 16 - char_height/2;
+        
+        // Apply teleport shader
+        outline_color = [other.sym_r0, other.sym_g0, other.sym_b0];
+        init_shader();
+	}
+	// for (m = 0; m < array_length(dead_teammates); m++;) {
 		
-	}
-	if tp_slide > array_length(tp_team) -1{ tp_slide = 0; tp_slide_step = 0;} //go back to beginning
-	else {tp_subject = tp_team[tp_slide];}
-	
-	
-}
-with oPlayer {
-	if get_player_team(player) == get_player_team(other.player) { //if on symmetra's team
-	
-		if (state == PS_RESPAWN && get_player_stocks(player) == 1) || state == PS_DEAD || get_player_stocks(player) == 0 || (player == other.player && get_player_stocks(player) == 1  && teleporter_ultimate.player_id != id) { //if you have one stock left or you are symmetra
-			set_player_stocks(player, get_player_stocks(player)+ 1); //add stock, its 2 for sym
-		}
-		if state == PS_DEAD { //if you have no stocks left
-			// set_player_stocks(player, 1); //set it to 1 stock
-			set_state(PS_RESPAWN);
-		}
-		if state == PS_RESPAWN {
-			other.tp_slide_step = 0;
-			other.tp_slide = array_find_index(other.tp_team,id);
-			other.tp_subject = other.tp_team[other.tp_slide];
-		}
-		if array_length(other.tp_team) > 0 {
-			for (n=0; n < array_length(other.tp_team); n++;) { //scan array for dead teammates array_length(other.tp_team)
-				// if other.tp_team[n] != noone {
-					if other.tp_team[n] == id { break;} //if you are in the array
-					else { //if you haven't found yourself yet
-						if other.tp_team[n] != id && n == array_length(other.tp_team) -1 { //if scanned entire array and didn't find yourself
-						array_push(other.tp_team, id); //add yourself to the array
-						}
-					}
-				// }
-				
-			}
-		}
-	
-		// }
-		//Respawn at the teleporter
-		if state == PS_RESPAWN && instance_exists(other.teleporter_ultimate) { x = other.teleporter_ultimate.x; y = other.teleporter_ultimate.y - 16 - char_height/2; outline_color = [other.sym_r0, other.sym_g0, other.sym_b0]; init_shader(); }
-	}
+	// 	// Give dead players another stock
+ //       var current_stocks = get_player_stocks(m);
+ //       if current_stocks <= 0 {set_player_stocks(m, 1);}
+        
+ //       // Respawn the dead players
+ //       m.set_state(PS_RESPAWN);
+ //       m.x = teleporter_ultimate.x;
+ //       m.y = teleporter_ultimate.y - 16 - m.char_height/2;
+        
+ //       // Apply teleport shader
+ //       m.outline_color = [sym_r0, sym_g0, sym_b0];
+ //       m.init_shader();
+ //   }
+    
+    // Clear the array
+    dead_teammates = [];
 }
 // Clear empty spaces and reoganize array
-if array_length(tp_team) > 0 {
-    for (m = 0; m < array_length(tp_team); m++;) {  //Start at first index and oldest turret
-        if tp_team[m] == noone {     // If current position empty
-            if array_length(tp_team) == 1 {         // If array only has one empty slot
-                tp_team = [];   // Reset array
-                break;
-            }
-            if array_length(tp_team) > 1 {      // If array has many tp_team
-                if m == 0 || m == (array_length(tp_team) - 1)  {      // If on either end of the array
-                    if m == 0 {         // If first in array and oldest turret
-                        tp_team = array_slice(tp_team, 1, array_length(tp_team)-1); // Shorten and cut out first index.
-                        m--;    //Restart next iteration at the same position which will have the new value
-                    }
-                    if m == (array_length(tp_team) - 1) {     // If last in array and most recent turret
-                        tp_team = array_slice(tp_team, 0, m);   // Shorten and cut out last index.
-                    }
-                }
-                else {      // If in the middle of the array
-                    if tp_team[m+1] != noone && (m+1) < array_length(tp_team) {    // If there is a next value in the array
-                        tp_team[m] = tp_team[m+1]; //move next position down a slot in the array
-                        tp_team[m+1] = noone; //make next position empty
-                        m--;    //Restart next iteration at the same position which will have the new value
-                    }
-                }
-            }
+if array_length(dead_teammates) > 0 {
+	var new_teammate_array = [];
+    for (m = 0; m < array_length(tp_team); m++;) {
+        if dead_teammates[m] != noone {
+        	array_push(new_teammate_array, dead_teammates[m]);
         }
-        else {
-        	if instance_exists(tp_team[m]) {
-        		if ("player" in self) && get_player_team(tp_team[m].player) == get_player_team(player) {
-        			//nothing
-        		}
-        		else {
-        			tp_team[m] = noone; //erase from array if not a player on team
-        		}
-        	}
-        }
+    }
+    if !array_equals(dead_teammates, new_teammate_array){
+    	dead_teammates = [];
+    	dead_teammates = array_clone(new_teammate_array);
     }    
 }
-}
-
-
-
-// if array_length(tp_team) == 2 {tp_subject = tp_team[0];}
-
-// }
-
 
 
 // // Kirby Support

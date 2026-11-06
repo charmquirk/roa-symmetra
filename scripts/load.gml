@@ -61,14 +61,13 @@ sprite_change_offset("deployable_healthbar", 41, 5);
 sprite_change_offset("deployable_mask", 31, 76);
 
 // Teleporter
+sprite_change_offset("portal", 31, 76);
 sprite_change_offset("teleporter_mask", 31, 76);
-sprite_change_offset("teleporter_portal", 31, 76);
 sprite_change_offset("teleporter_preview", 31, 76);
 
 // Spawn Point Ultimate
+sprite_change_offset("hologram", 63, 140);
 sprite_change_offset("spawn_point_preview", 31, 76);
-sprite_change_offset("spawn_point_hologram", 63, 140);
-
 
 // Beam
 sprite_change_offset("beam_tip", 31, 31);

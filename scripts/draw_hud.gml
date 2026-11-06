@@ -33,24 +33,26 @@ if turret_timer > 0 { //Cooldown
 }
 else {
     if (special_down && attack == AT_DSPECIAL && window == 2 && !has_rune("E")) || (has_rune("E") && instance_exists(sentry)) { //active
-        dspecial_sprite_name = dspecial_hud_sprite_active;
+        dspecial_hud_sprite = dspecial_hud_sprite_active;
        }
     else { //inactive
-        dspecial_sprite_name = dspecial_hud_sprite_inactive;
+        dspecial_hud_sprite = dspecial_hud_sprite_inactive;
         }
 }
-draw_sprite_ext(sprite_get(dspecial_sprite_name), image_index, temp_x+40, temp_y-40, 1, 1, 0, c_white, 1);
+draw_sprite_ext(sprite_get(dspecial_hud_sprite), image_index, temp_x+40, temp_y-40, 1, 1, 0, c_white, 1);
 
 // Turret cooldown
 if turret_timer > 0 {
-    draw_debug_text(temp_x + 53, temp_y - 28, string(round((turret_timer+ ((turret_charges - max_turrets + 1)*turret_rate))/60)));
+    var charges_needed = turret_charges_max - turret_charges;
+    var ticks_left = turret_timer + (charges_needed * turret_rate);
+    var time_left = round(ticks_left/60);
+    draw_debug_text(temp_x + 53, temp_y - 28, string(time_left));
     // textDraw(temp_x + 57, temp_y - 28, "fName", c_white, 0, 1000, 1, true, 1, string(round((turret_timer+ ((turret_charges - max_turrets + 1)*turret_rate))/60))); //subtracts missing turrets to show the cooldown for the next turret
 }
 
 // Turret charges
-var turret_charge_sprite_name = "charge_empty" ;
-if max_turrets > 1 {
-    turret_charge_sprite_name = turret_charges == 0 ? "charge_empty" : "charge";
+if has_rune_more_turrets {
+    var turret_charge_sprite_name = turret_charges == 0 ? "charge_empty" : "charge";
     draw_sprite_ext(sprite_get(turret_charge_sprite_name), 0, temp_x+44, temp_y-68, 1, 1, 0, c_white, 1);
     draw_debug_text(temp_x + 53, temp_y - 61, string(turret_charges));
 }

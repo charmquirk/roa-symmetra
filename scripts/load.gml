@@ -106,6 +106,8 @@ sprite_change_offset("orb_guide", 0, 16);
 
 // Custom Effects / CFX
 sprite_change_offset("cfx_rainbow", 17, 17);
+sprite_change_offset("cfx_heal", 17, 17);
+sprite_change_offset("cfx_sentry_fire", 17, 17);
 
 
 

@@ -17,19 +17,4 @@ if ("damage_cd" in self) && ("sentry_health" in self) {
     }
 }
 
-
-// Draw the legs
-var turret_legs_sprite = "";
-switch state {
-    case -1:
-    case 2:
-        turret_legs_sprite = free ? "sentry_aerial_deactivated" : "sentry_grounded_deactivated";
-        break;
-    case 0:
-    case 1:
-        turret_legs_sprite = free ? "sentry_aerial" : "sentry_grounded";
-        break;
-}
-
-
 // draw_debug_text(x,y-64,string(damage_cd));

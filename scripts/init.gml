@@ -239,17 +239,65 @@ orb_h = 0;
 orb_v = 0;
 
 // Sentry Turrets
-sentry = noone;
+turret_charges_max = has_rune_more_turrets ? 3 : 1;
+turret_charges = turret_charges_max;
 turrets = [];
+for (i = 0; i < turret_charges_max; i++;) {    turrets[i] = noone;  }
 turret_timer = 0;
 turret_rate = 60*8;
 turret_placing = false;
-max_turrets = has_rune_more_turrets ? 3 : 1;
-turret_charges = max_turrets;
+turret_target_effect = has_rune_turret_heal ? "cfx_heal_strip" : "cfx_sentry_fire";
 dspecial_hud_sprite_inactive = has_rune_turret_heal ? "ability_sentryturret_healing" : "ability_sentryturret";
 dspecial_hud_sprite_active = has_rune_turret_heal ? "ability_sentryturret_healing_active" : "ability_sentryturret_active";
 dspecial_hud_sprite_cooldown = has_rune_turret_heal ? "ability_sentryturret_healing_cooldown" : "ability_sentryturret_cooldown";
 
+// Team     -   Used for beam and turret targetting
+player_count = 0
+// all_players = [];
+// other_players = [];
+// for (i = 0; i < 4; i++) {
+//     if is_player_on(i) {
+//         player_count += 1;
+//         array_push(all_players, i);
+//         if id != i {
+//             array_push(other_players, i);
+//         }
+//     }
+// }
+// opponents = [];
+// for (i = 0; i < 4; i++) {   if get_player_team(i) != get_player_team(id) {  array_push(opponents, i);  }   }
+// my_team = [];
+// teammates = [];
+// for (i = 0; i < 4; i++) {
+//     if get_player_team(i) == get_player_team(id) {
+//         array_push(my_team, i); 
+//         if id != i {
+//             array_push(teammates, i);
+//         }
+//     }
+// }
+// beam_targets = [];
+// turret_targets = [];
+// if get_match_setting(SET_TEAMATTACK) == true {
+//     beam_targets = array_clone(all_players);
+//     turret_targets = array_clone(all_players);
+// }
+// else {
+//     // Beam
+//     if has_rune_beam_heal {
+//         beam_targets = array_clone(teammates);
+//     }
+//     else {
+//         beam_targets = array_clone(opponents);
+//     }
+//     // Turrets
+//     if has_rune_turret_heal {
+//         turret_targets = array_clone(my_team);
+//     }
+//     else {
+//         turret_targets = array_clone(opponents);
+//     }
+// }
 
 
 orig_dash_speed = dash_speed;

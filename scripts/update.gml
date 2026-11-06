@@ -10,6 +10,8 @@ if has_rune_long_dodge && (state == PS_AIR_DODGE || state == PS_WAVELAND) {draw_
 //Ultimate charge
 if has_rune("L") && is_fighting && ult_charge < ult_cost && !instance_exists(teleporter_ultimate) { //if not dead or spawning //
 	ult_charge++;//passively generate ultimate charge
+		ult_charge++;	//	Passively generate ultimate charge.
+	}
 }
 
 
@@ -22,6 +24,8 @@ if (turret_timer > 0) { turret_timer--; }
 // Regenerate charges for turrets if max charges hasn't been reached
 if (turret_charges < max_turrets) {
 	var refresh_time = turret_rate * (max_turrets - turret_charges - 1);
+if (turret_charges < turret_charges_max) {
+	var refresh_time = turret_rate * (turret_charges_max - turret_charges - 1);
 	if (turret_timer >= refresh_time){	// If the timer reaches 0
      	turret_charges++;				// Create a charge
  	}
@@ -31,17 +35,6 @@ if (turret_charges < max_turrets) {
 }
 
 
-// Shrink array to remove gaps.
-if array_length(turrets) > 0 {
-	var new_turret_array = [];
-    for (i = 0; i < array_length(turrets); i++;) {  //Start at first index and oldest turret
-    	if turrets[i] != noone {
-    		array_push(new_turret_array,turrets[i]);
-    	}
-    }
-    if !array_equals(turrets, new_turret_array) {
-	    turrets = [];
-	    turrets = array_clone(new_turret_array);
     }
 }
 
@@ -257,8 +250,6 @@ if instance_exists(teleporter_ultimate) {
         
  //       // Apply teleport shader
  //       m.outline_color = [sym_r0, sym_g0, sym_b0];
- //       m.init_shader();
- //   }
     
     // Clear the array
     dead_teammates = [];
@@ -363,44 +354,6 @@ if array_length(dead_teammates) > 0 {
 //     	}
 //     }
 // }
-
-#define deployable_destroy(old_instance, instance_array) {
-	if (instance_exists(old_instance) && "state" in old_instance) {
-		old_instance.state = 2; // Set to destroying
-		old_instance.state_timer = 0;
-	}
-	array_clear(instance_array, old_instance);
-	
-	var new_array = [];
-	for (i = 0; i < array_length(instance_array); i++;) {  //Start at first index and oldest turret
-    	if instance_array[i] != noone {
-    		array_push(new_array, instance_array[i]);
-    	}
-    }
-	if !array_equals(instance_array, new_array) {
-	    instance_array = [];
-	    instance_array = array_clone(new_array);
-	}
-	return new_array;
-}
-
-#define deployable_create(instance_name, instance_array, array_size, x_value, y_value) {
-	var new_instance = instance_create(x_value, y_value, instance_name);
-	if (instance_exists(new_instance) && "state" in new_instance) {
-		new_instance.state = -1; // Set to preview
-		new_instance.state_timer = 0;
-	}
-	array_push(instance_array, new_instance);
-	
-	// If the array is too big, delete the oldest indexes.
-	var size_difference = array_length(instance_array) - array_size;
-	if size_difference > 0 {
-		var duplicated_array = array_clone(instance_array);
-		for (i = 0; i < size_difference; i++;) {
-			deployable_destroy(duplicated_array[i], instance_array);
-		}
-	}
-	
 	return new_instance;
 }
 

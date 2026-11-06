@@ -624,37 +624,49 @@ switch(attack) {
         }
         break;
     
-    case AT_DSPECIAL :
+    case AT_DSPECIAL :	// Turrets
+    	var new_turret = noone; // Null instance id.
         switch(window) {
-        	case 1 : 
-        		// Delete old turrets if possible
-        		for (k = 0; k < array_length(turrets); k++;) {
-			        if k >= (array_length(turrets) - max_turrets) {
-			            var extra_turret = turrets[k];
-			            if extra_turret != noone {
-			                extra_turret.state = 2;
-			                extra_turret.state_timer = 0;
-			            }
-			        }
-			    	break;
+        	case 1 :
+        		if window_timer == 1 { // Only execute on first frame.
+        			if has_rune_more_turrets {
+        				turrets = deployable_destroy(turrets, turrets[0]); // Destroy oldest turret, if possible.
+        			}
+        			else{
+        				turrets = deployable_destroy_all(turrets);
+        				move_cooldown[AT_DSPECIAL] = 4;	// Add cooldown if it's only one turret.
+        			}
         		}
-        		if !has_rune_more_turrets { move_cooldown[AT_DSPECIAL] = 12; }
         		break;
         	
-            case 2: //deploy
+            case 2 : // Preview
+            	if window_timer == 1 { // Only execute on first frame.
+            		// Cancel if you can't create turrets.
+            		if turret_charges <= 0 {	move_cooldown[AT_DSPECIAL] = 4; }
+            	}
+            	if !special_down && state_timer > 20 {	// If special button released...
+            		window = 3;	// Switch to next attack window.
+            		window_timer = 0;
+                }
                 break;
             
-            case 3: //end
-            	if (turret_charges > 0 && window_timer == 1) {
-            		var turret_y_offset = free ? y-char_height/2 : y-18;
-            		sentry = instance_create(x, turret_y_offset, "obj_article3");
-            		sentry.can_be_grounded = !free;
-            		sentry.is_healing = has_rune_turret_heal;
-            		sentry.is_weak_turret = has_rune_more_turrets;
-            		array_push(turrets, sentry);
-            		turret_timer += turret_rate;
-        			turret_charges--;
-                	move_cooldown[AT_DSPECIAL] = 12; //Cooldown before placing next turret
+            case 3 : // Deploy
+            	if window_timer == 1 && turret_charges > 0 && turret_timer <= 0 { // Only execute on first frame
+            		if !instance_exists(new_turret) {
+            			// Place grounded turrets on the ground,
+            			// Place aerial turrets at the midline of the character.
+            			var turret_y_offset = free ? y-char_height/2 : y-18;
+	            		new_turret = deployable_create(turrets, "obj_article3", x, turret_y_offset);
+            		}
+            		if instance_exists(new_turret) {
+						new_turret.can_be_grounded = !free;
+	            		new_turret.is_healing = has_rune_turret_heal;
+	            		new_turret.is_weak_turret = has_rune_more_turrets;
+	            		turret_timer += turret_rate;
+	        			turret_charges--;
+	                	move_cooldown[AT_DSPECIAL] = 4; //Cooldown before placing next turret
+            		}
+            		else {	print_debug("ERROR: Failed to create sentry turret!");	}
 			    }
                 break;
 		}
@@ -665,8 +677,6 @@ switch(attack) {
 if (attack == AT_NSPECIAL || attack == AT_JAB || attack == AT_DSPECIAL || attack == AT_EXTRA_2)  { //&& window == 2
 	
 	draw_indicator = false;		// Hide indicator while aiming
-	
-	
 	
     // Single Jump
     if jump_pressed && !free {
@@ -685,19 +695,79 @@ if (attack == AT_NSPECIAL || attack == AT_JAB || attack == AT_DSPECIAL || attack
     	hsp = (!free) ? (hsp*air_friction) : (hsp*ground_friction);
     }
     
-
     // Cannot double jump or dash/sprint while aiming. //
 }
 
+#define deployable_destroy(instance_array, old_instance)
+instance_array = clear_instance_from_array(instance_array, old_instance);
+
+// Move existing instances to the front of the array.
+var instance_array_length = array_length(instance_array);
+var new_array = [];
+for (i = 0; i < array_length(instance_array); i++;) {
+	if instance_array[i] != noone {
+		array_push(new_array, instance_array[i]);	// Add existing instance.
+	}
+}
+// Add empty slots in the back of the array.
+var new_array_length = array_length(new_array);
+for (i = new_array_length - 1; i < instance_array_length; i++;) {
+	array_push(new_array, noone);	// Add non-existant instance.
+}
+
+instance_array = array_clone(new_array);
+return instance_array;
+
+#define deployable_destroy_all(instance_array)
+for (i = 0; i < array_length(instance_array); i++;) {
+	var old_instance = instance_array[i];
+	instance_array = clear_instance_from_array(instance_array, old_instance);
+}
+return instance_array;
 
 
-// #define scan_objects
-// //scan_objects(index, ...values)
-// // Used in a for loop's with statement to scan multiple objects
-// // with (scan_objects(index, obj1, obj_2, obj_3))
+#define deployable_create(instance_array, instance_name, x_value, y_value)
+// Find an empty slot in the array.
+var instance_index = -1;
+var last_index = array_length(instance_array) - 1;
+for (i = 0; i < array_length(instance_array); i++;) {
+	var current_instance = instance_array[i];
+	if current_instance == noone { instance_index = i;} // If empty, use this slot.
+	if i == last_index && current_instance != noone {
+		deployable_destroy(instance_array, current_instance); // If no slots are empty, clear the first slot.
+		instance_index = last_index;
+	}
+}
 
-// return argument[argument[0] + 1];
+if instance_array[instance_index] != noone {	// If the index has an instance...
+	instance_array = deployable_destroy(instance_array, instance_index);	// Clear the index and update the array.
+}
 
-// #define is_teammate
-// is_teammate(my_player, other_player)
-// return my_player != other_player && get_player_team(my_player) != get_player_team(other_player);
+var new_instance = instance_create(x_value, y_value, instance_name);
+if (instance_exists(new_instance) && "state" in new_instance) {
+	new_instance.state = -1; // Set to preview
+	new_instance.state_timer = 0;
+}
+array_push(instance_array, new_instance);
+return new_instance;
+
+#define deployable_activate(old_instance)
+if (instance_exists(old_instance) && "state" in old_instance) {
+	old_instance.state = 0; // Set to idle
+	old_instance.state_timer = 0;
+}
+
+#define clear_instance_from_array(instance_array, old_instance)
+var new_array = array_clone(instance_array);
+if (instance_exists(old_instance) && "state" in old_instance) {
+	var old_index = array_find_index(instance_array, old_instance);
+	old_instance.state = 2; // Set to destroying.
+	old_instance.state_timer = 0;
+	if old_index != -1 {
+		new_array[old_index] = noone;	// Clear old instance from array.
+	}
+}
+instance_array = new_array;
+return instance_array;
+
+

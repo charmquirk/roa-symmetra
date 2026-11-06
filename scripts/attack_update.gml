@@ -3,7 +3,7 @@
 
 
 //B - Reversals
-if (attack == AT_NSPECIAL || attack == AT_FSPECIAL || attack == AT_DSPECIAL || attack == AT_USPECIAL){
+if (attack == AT_NSPECIAL || attack == AT_FSPECIAL || attack == AT_DSPECIAL || attack == AT_USPECIAL) {
     trigger_b_reverse();
 }
 
@@ -24,11 +24,8 @@ if has_rune_spawn_point && special_down && attack_down && ult_charge >= ult_cost
 switch(attack) {
     
     case AT_EXTRA_1 : //Reload
-    	switch(window) {
-    		case 2:
-    			if (window_timer == 1) {	ammo = max_ammo;	}		 // Reloads weapon
-    	}
-    	weapon_aim = (90*(1-spr_dir));
+    	if window == 2 && window_timer == 1	{	ammo = max_ammo;	}
+    	weapon_aim = (90*(1-spr_dir));	// Reset weapon aim.
         orb_h = (90*(1-spr_dir));
         orb_v = 0;
     	break;
@@ -66,7 +63,7 @@ switch(attack) {
     
     	
     case AT_TAUNT:
-    	if ammo < max_ammo {	set_attack(AT_EXTRA_1);   	}
+    	if ammo < max_ammo {	set_attack(AT_EXTRA_1);   	} // Switch to reload if necessary.
     	break;
     	
     case AT_JAB :
@@ -672,6 +669,7 @@ switch(attack) {
 		}
 		break;
 }
+
 
 //Movement
 if (attack == AT_NSPECIAL || attack == AT_JAB || attack == AT_DSPECIAL || attack == AT_EXTRA_2)  { //&& window == 2

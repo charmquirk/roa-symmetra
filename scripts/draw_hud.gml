@@ -57,7 +57,6 @@ if has_rune_more_turrets {
     draw_debug_text(temp_x + 53, temp_y - 61, string(turret_charges));
 }
 
-
 // Teleporter
 var uspecial_sprite_name = "ability_teleporter";
 if (attack == AT_USPECIAL && special_down) || instance_exists(teleporter_entrance) || instance_exists(teleporter_exit) {
@@ -133,4 +132,3 @@ if argument[7]{ //text outline
 draw_text_ext_transformed_color(argument[0], argument[1], argument[9], argument[4], argument[5], argument[6], argument[6], 0, argument[3], argument[3], argument[3], argument[3], argument[8]);
 
 return string_width_ext(argument[9], argument[4], argument[5]);
-

@@ -38,13 +38,14 @@ cfx_sentry_fire = hit_fx_create(player_id.turret_damage_effect, chip_threshold);
 cfx_heal = hit_fx_create(player_id.turret_heal_effect, chip_threshold);
 
 // Health
-health_max = is_weak_turret ? 16 : 64;     //maximum damage it can take
-health = health_max;
+health_max = 64;    	// Set in attack_update
+health = 0;
+lifetime = player_id.turret_rate;	// Set in attack_update
 
 // Invulnerability
-damage_base_cd = 6;             //Minimum time that it takes for turrets to be able to take damage again
-damage_cd = 0;     //Time that it takes for turrets to be able to take damage again. Turrets spawn invulnerable.
-damage_alpha = .33;             //The opacity when invulnerable.
+damage_base_cd = 6;		//Minimum time that it takes for turrets to be able to take damage again
+damage_cd = 0;			//Time that it takes for turrets to be able to take damage again. Turrets spawn invulnerable.
+damage_alpha = .33;		//The opacity when invulnerable.
 
 // Movement
 flying_dir = 0;

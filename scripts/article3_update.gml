@@ -9,8 +9,14 @@ switch state {
 		break;
 	case 0:
 	case 1:
+		// Expiration
+		if state_timer >= lifetime {
+            state = 2;
+            state_timer = 0;
+        }
+		
 		// Death
-		if health > health_max {	// If sentry takes too much damage...
+		if health >= health_max {	// If sentry takes too much damage...
 			state = 2; // Deactivate.
 			state_timer = 0;
 			spawn_hit_fx(x, y - 16, 301);
@@ -147,7 +153,6 @@ switch (state) {
 		if state_timer >= 2/deploy_speed { // If the state time is double what is needed to fade in.
 			state = 0;	// Activate
 	 		state_timer = 0;
-	 		sprite_index = free ? sprite_get("sentry_aerial"): sprite_get("sentry_grounded");
 		}
 		break;
 	case 0:

@@ -243,7 +243,7 @@ orb_v = 0;
 turret_charges_max = has_rune_more_turrets ? 3 : 1;
 turret_charges = turret_charges_max;
 turrets = [];
-for (i = 0; i < turret_charges_max; i++;) {    turrets[i] = noone;  }
+for (i = 0; i < turret_charges_max; i++;) {    array_push(turrets, noone);  }
 turret_timer = 0;
 turret_rate = 60*8;
 turret_placing = false;

@@ -35,6 +35,20 @@ switch state {
 }
 
 
+// Collect targets
+if get_match_setting(SET_TEAMATTACK) == 1 || is_healing {	array_push(targets, player_id);	}
+with oPlayer {
+	if get_match_setting(SET_TEAMATTACK) == 1
+	|| (get_player_team(id) == get_player_team(other.player_id) && other.is_healing)
+	|| (get_player_team(id) != get_player_team(other.player_id) && !other.is_healing)
+	{
+		if array_find_index(other.targets, id) == -1 {
+			array_push(other.targets, id);
+		}
+	}
+}
+
+
 // Target selection
 if target == noone && state == 0 && array_length(targets) > 0 {
     // Calculate the distance from each target

@@ -19,15 +19,14 @@ is_healing = false;
 // Aiming
 aim_angle = 0;
 aim_range = is_weak_turret ? 32*5 : 32*8;
-target_distance = 0;     // Target distance
-target_angle = 0;      // Target angle
-distances = []; // Player distances from the turret.
+target_distance = 0;    // Target distance
+target_angle = 0;   	// Target angle
+distances = []; 		// Player distances from the turret.
 
 // Damage
-chip_damage = is_healing ? -1 : 1;
-chip_increment = 0;
-chip_threshold = is_healing ? 30 : 15;
-turret_beam = 0;
+chip_damage = 1;		// Set in attack_update
+chip_increment = 0;		
+chip_threshold = 10;	// Set in attack_update
 
 // Deployment
 placement_alpha = 0.5;      // The starting alpha value while state = -1
@@ -69,13 +68,3 @@ sym_color0 = make_color_rgb(player_id.sym_r0,player_id.sym_g0,player_id.sym_b0);
 // Targets
 target = noone;
 targets = [];   // Potential players for the turret to target.
-with oPlayer {
-	if get_match_setting(SET_TEAMATTACK) == 1
-	|| (get_player_team(id) == get_player_team(other.player_id) && other.is_healing)
-	|| (get_player_team(id) != get_player_team(other.player_id) && !other.is_healing)
-	{
-		if array_find_index(other.targets, id) == -1 {
-			array_push(other.targets, id)
-		}
-	}
-}

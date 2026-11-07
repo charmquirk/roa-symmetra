@@ -29,9 +29,7 @@ if (tp_timer > 0) {  tp_timer--;  }
 if (turret_timer > 0) { turret_timer--; }
 
 
-// Regenerate charges for turrets if max charges hasn't been reached
-if (turret_charges < max_turrets) {
-	var refresh_time = turret_rate * (max_turrets - turret_charges - 1);
+// Regenerate turret charges
 if (turret_charges < turret_charges_max) {
 	var refresh_time = turret_rate * (turret_charges_max - turret_charges - 1);
 	if (turret_timer >= refresh_time){	// If the timer reaches 0

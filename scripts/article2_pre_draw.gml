@@ -4,13 +4,13 @@ if ("damage_cd" in self) && ("tp_health" in self) && state == 0 {
     var portal_sprite = "";
     var portal_subimg = 0;
     if type == "ultimate" {
-        portal_sprite = "spawn_point_hologram";
+        portal_sprite = "hologram";
         portal_subimg = get_gameplay_time()/6;
         if player_id.tp_subject != noone {
             with player_id.tp_subject {draw_sprite_ext(sprite_index, get_gameplay_time()/8, other.x, other.y - 16 - char_height/2, spr_dir, 1, 0, other.sym_color0, (other.damage_cd > 0) ? 0 : 0.5);}//0.5*(other.player_id.tp_slide_step/other.player_id.tp_slide_length)
         }
     else {
-        portal_sprite = "teleporter_portal";
+        portal_sprite = "portal";
         portal_subimg = get_gameplay_time()/8;
     }
     draw_sprite_ext(sprite_get(portal_sprite), portal_subimg, x,y, 1, 1, 0, c_white, (damage_cd > 0) ? 0 : 0.5);
@@ -32,6 +32,6 @@ if ("damage_cd" in self) && ("tp_health" in self) && state == 0 {
     if damage_cd > 0 && tp_health < tp_max_health { //if damage taken
         var healthbar_length = ((tp_max_health-tp_health)/tp_max_health)*78;
         draw_sprite_ext(sprite_get("healthbar"), 0,x-38,y-86, healthbar_length, 1, 0, sym_color0, 1); //78 is the width of the inner space
-        draw_sprite(sprite_get("deployable_healthbar"), 0, x,y-86);
+        draw_sprite(sprite_get("deployable_healthbar"), 0, x, y-86);
     }
 }

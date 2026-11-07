@@ -7,9 +7,17 @@ if has_rune_long_dodge && (state == PS_AIR_DODGE || state == PS_WAVELAND) {draw_
 // else {  outline_color = [0,0,0];}outline_color = [sym_r0,sym_g0,sym_b0];
 
 
-//Ultimate charge
-if has_rune("L") && is_fighting && ult_charge < ult_cost && !instance_exists(teleporter_ultimate) { //if not dead or spawning //
-	ult_charge++;//passively generate ultimate charge
+// Ultimate charge
+if has_rune_shield_wall
+|| has_rune_shield_gen
+|| has_rune_spawn_point
+{
+	if state != PS_DEAD 
+	&& state != PS_SPAWN
+	&& state != PS_RESPAWN
+	&& ult_charge < ult_cost
+	&& !instance_exists(ult_instance)
+	{
 		ult_charge++;	//	Passively generate ultimate charge.
 	}
 }
@@ -54,157 +62,106 @@ if beam_timer > 0 && beam_length > beam_range {
 if ("beam_lock_time" in self) { clamp(beam_timer, 0, beam_lock_time);}
 
 
-
+// Teleporter Movement
 if attack == AT_USPECIAL {
-	if instance_exists(teleporter_exit) && teleporter_exit.state = -1 {
+	var tp_exit = teleporters[1];
+	if instance_exists(tp_exit) && tp_exit.state == -1 {	// If teleporter exit hasn't deployed yet...
 		
-		// var tp_yrange = 256;
-		// var tp_height = 76;
-		// var tp_nxp = teleporter_exit.x - teleporter_exit.tp_xv;     //next position for tp
-		// var collide_solid = collision_line(tp_nxp, teleporter_exit.y-tp_yrange, tp_nxp, teleporter_exit.y+tp_yrange, asset_get("par_block"), false, true);	// If solid at projected location
-		// var collide_plat = collision_line(tp_nxp, teleporter_exit.y-tp_yrange, tp_nxp, teleporter_exit.y+tp_yrange, asset_get("par_jumpthrough"), false, true);		// If solid at projected location
 		
-		if (left_down || right_down) {	//If trying to move and next projected location is available		 && place_free(tp_nxp,teleporter_exit.y) && place_free(tp_nxp,teleporter_exit.y-tp_height) 
-			if left_down && !right_down {	teleporter_exit.tp_xv -= teleporter_exit.accel;	}
-			if right_down && !left_down {	teleporter_exit.tp_xv += teleporter_exit.accel; }
-			teleporter_exit.tp_xv = clamp(teleporter_exit.tp_xv, -teleporter_exit.max_hsp, teleporter_exit.max_hsp);
+		var tp_height = 76;
+		var current_position_x = tp_exit.x;
+		var current_position_y = tp_exit.y;
+		var next_position_x = current_position_x + tp_exit.x_velocity;
+		var next_position_y = current_position_y + tp_exit.y_velocity;
+		var is_colliding_solid = collision_line(current_position_x, current_position_y, next_position_x, next_position_y, asset_get("par_block"), false, true);	// If solid at projected location
+		var is_colliding_plat = collision_line(current_position_x, current_position_y, next_position_x, next_position_y, asset_get("par_jumpthrough"), false, true);		// If solid at projected location
+		
+		// Horizontal movement
+		var h_dir = right_down - left_down;
+		if h_dir == 0 || is_colliding_solid || is_colliding_plat {
+			tp_exit.x_velocity *= tp_exit.accel;	// Decellerate	
 		}
 		else {
-			if teleporter_exit.tp_xv != 0 {	teleporter_exit.tp_xv = teleporter_exit.tp_xv * teleporter_exit.accel;	}
+			tp_exit.x_velocity += h_dir * tp_exit.accel;	// Accelerate
+			tp_exit.x_velocity = clamp(tp_exit.x_velocity, -tp_exit.hsp_max, tp_exit.hsp_max);
 		}
-		teleporter_exit.x += teleporter_exit.tp_xv;
-		teleporter_exit.x = round(teleporter_exit.x);
 		
-		// if (collide_plat || collide_solid) {
-		// 	teleporter_exit.x = teleporter_exit.tp_x;
-		// }
-		
-		
-		
-		
-		
-		if teleporter_exit.x > x { spr_dir = 1; }
-		else { spr_dir = -1; }
-		
-		// Move the exit vertically
-		if (up_down || down_down ) {
-			if up_down && !down_down {
-				teleporter_exit.can_be_grounded = true;
-				teleporter_exit.tp_yv -= teleporter_exit.accel;	
-			}
-			if (down_down && !up_down) {
-				teleporter_exit.can_be_grounded = false;
-				teleporter_exit.tp_yv += teleporter_exit.accel;	
-    		}
+		// Vertical movement
+		var v_dir = down_down - up_down;
+		tp_exit.can_be_grounded = down_down;	// Pass through platforms if pressing down.
+		if v_dir == 0 || is_colliding_solid || is_colliding_plat {
+			tp_exit.y_velocity *= tp_exit.accel;	// Decellerate
+			if !(right_down || left_down) { tp_exit.y_velocity = tp_exit.grav; }	// Gravity
 		}
-    	else {
-    		if !right_down && !left_down { teleporter_exit.vsp = teleporter_exit.grav; }	//gravity
-    		if teleporter_exit.tp_yv != 0 {	teleporter_exit.tp_yv = teleporter_exit.tp_yv * teleporter_exit.accel;	}
+		else {	
+			tp_exit.y_velocity += v_dir * tp_exit.accel;	// Accellerate
+			tp_exit.y_velocity = clamp(tp_exit.y_velocity, -tp_exit.vsp_max, tp_exit.vsp_max);
 		}
-		if teleporter_exit.tp_yv != 0 {teleporter_exit.vsp = clamp(teleporter_exit.vsp, -teleporter_exit.vsp_max, teleporter_exit.vsp_max);}
-		teleporter_exit.y += teleporter_exit.tp_yv;
-		teleporter_exit.y = round(teleporter_exit.y);
-		// if (up_pressed || down_pressed ) {
-		// 	if up_pressed {
-			
-		// 		teleporter_exit.can_be_grounded = true;
-				
-		// 		if teleporter_exit.free != true {
-		// 			teleporter_exit.vsp = -256;
-		// 		}
-				
-		// 	}
-		// 	if (down_pressed) {
-		// 		teleporter_exit.vsp++;
-		// 		teleporter_exit.vsp = clamp(teleporter_exit.vsp, -teleporter_exit.max_vsp, teleporter_exit.max_vsp);
-		// 		teleporter_exit.can_be_grounded = false;
-  //  		}
+		
+		spr_dir = sign(tp_exit.x - x);
+		
+		// Limit the range of exit teleporter.
+		var tp_range_x = 256;
+		tp_exit.x = clamp(tp_exit.x, x - tp_range_x, x + tp_range_x);
+		var tp_range_y = 96;
+		tp_exit.y = clamp(tp_exit.y, y - tp_range_y, y + tp_range_y);
+		
+		// Allow jumping.
+		// if jump_pressed && !free {
+		// 	clear_button_buffer(PC_JUMP_PRESSED);
+		// 	vsp = -jump_speed;
+		// 	sound_play(asset_get("sfx_jumpground"));
 		// }
-  //  	else {
-  //  		// teleporter_exit.vsp = teleporter_exit.max_vsp;		//gravity
-		// }
-		if jump_pressed && !free {
-    		clear_button_buffer(PC_JUMP_PRESSED);
-			vsp = -jump_speed;
-			sound_play(asset_get("sfx_jumpground"));
-    	}
 	}
 }
 
 
 
 
-// Teleporting yourself
-if (("tp_timer" in self) && ("tp_tp_timer" in self) && tp_tp_timer <= 0 && taunt_pressed && instance_place(x,y,teleporter_entrance) && teleporter_entrance.state = 0) {
-        tp_tp_timer = tp_interval;
-        x = teleporter_exit.x;
-        y = teleporter_exit.y;
-        move_cooldown[AT_TAUNT] = tp_interval;
-        outline_color = [sym_r1,sym_g1,sym_b1];
-        init_shader();
-}
-if (("tp_timer" in self) && ("tp_tp_timer" in self) && tp_tp_timer <= 0 && taunt_pressed && instance_place(x,y,teleporter_exit) && teleporter_exit.state = 0) {
-        tp_tp_timer = tp_interval;
-        x = teleporter_entrance.x;
-        y = teleporter_entrance.y;
-        move_cooldown[AT_TAUNT] = tp_interval;
-        outline_color = [sym_r1,sym_g1,sym_b1];
-        init_shader();
+// Teleporting
+if instance_exists(teleporters[0]) && instance_exists(teleporters[1]) {
+	with oPlayer {
+		if "tp_tp_timer" in self {
+			// The timer ticks down.
+			if tp_tp_timer > 0 {	--tp_tp_timer;	}
+			// The outline color resets after teleporting.
+			else if tp_tp_timer == 0 {	outline_color = [0,0,0];	init_shader();	}
+			
+			if get_match_setting(SET_TEAMATTACK) == 1	// If team attack is enabled, enemies can teleport too.
+			|| get_player_team(player) == get_player_team(other.player)		// If player is on the same team as Symmetra
+			{
+				if tp_tp_timer <= 0 && taunt_pressed {
+					for (i = 0; i < 2; i++;) {
+						var nearby_tp = other.teleporters[i];
+						if instance_exists(nearby_tp)
+						&& instance_place(x, y, nearby_tp)
+						&& "state" in nearby_tp
+						&& nearby_tp.state = 0 {
+							var next_index = (i + 1) % 2;
+							var far_tp = other.teleporters[next_index];
+							tp_tp_timer = other.tp_interval;
+							x = far_tp.x;
+						    y = far_tp.y;
+						    move_cooldown[AT_TAUNT] = other.tp_interval;
+						    outline_color = [other.sym_r1, other.sym_g1, other.sym_b1];
+						    init_shader();
+						}
+					}
+				}
+			}
+		}
+	}
 }
 
 
-with oPlayer {
-    if ("tp_tp_timer" in self) && tp_tp_timer > 0 {
-        --tp_tp_timer;
-    }
-    if ("tp_tp_timer" in self) {switch(tp_tp_timer) {
-        case 0:
-            outline_color = [0,0,0];
-            init_shader();
-            break;
-    }}
-    // Teleporting other players only
-    if other.player != player {
-        if (get_match_setting(SET_TEAMATTACK) == 1 || get_player_team(player) == get_player_team(other.player)) {
-    
-            // Other players teleporting
-            if (tp_tp_timer <= 0 && taunt_pressed && instance_place(x,y,other.teleporter_entrance) && other.teleporter_entrance != teleporter_entrance && other.teleporter_entrance.state = 0) {
-            // If its not your teleporter, the owner will process it
-                tp_tp_timer = tp_interval;
-                x = other.teleporter_exit.x;
-                y = other.teleporter_exit.y;
-                // spawn_hit_fx(x,y,14);
-                move_cooldown[AT_TAUNT] = tp_interval;
-                outline_color = [other.sym_r1,other.sym_g1,other.sym_b1];
-                init_shader();
-            }
-            if (tp_tp_timer <= 0 && taunt_pressed && instance_place(x,y,other.teleporter_exit) && other.teleporter_exit != teleporter_exit && other.teleporter_entrance.state = 0) {
-                tp_tp_timer = tp_interval;
-                x = other.teleporter_entrance.x;
-                y = other.teleporter_entrance.y;
-                // spawn_hit_fx(x,y,14);
-                move_cooldown[AT_TAUNT] = tp_interval;
-                outline_color = [other.sym_r1,other.sym_g1,other.sym_b1];
-                init_shader();
-            }
-        }
-    }
-}  
 
-// Beam charge decreases if you're doing something else, you're not firing beam, or if your beam isn't hitting anyone.
-// if (charge > 0 && attack != AT_JAB || charge > 0 && attack == AT_JAB && has_hit == false || charge > 0 && attack == AT_JAB && attack_down == false) {
-// Beam charge decreases if you're doing something else, or you're not firing beam, or you're not targeting anyone and haven't hit anyone
-if charge > 0 {
-    if (attack != AT_JAB || attack == AT_JAB && attack_down == false || attack == AT_JAB && beam_target == noone) {
-        charge -= charge_decay;
-    }
-}
+
 
 
 // Cancel preview attacks
 if (state == PS_HITSTUN || state == PS_HITSTUN_LAND || state == PS_TUMBLE || state == PS_PRATFALL || state == PS_PRATLAND || state == PS_FROZEN || state == PS_WRAPPED || state == PS_DEAD) {
-    if instance_exists(teleporter_entrance) && teleporter_entrance.state = -1 { instance_destroy(teleporter_entrance); }
-    if instance_exists(teleporter_exit) && teleporter_exit.state = -1 { instance_destroy(teleporter_exit); }
+    // if instance_exists(teleporter_entrance) && teleporter_entrance.state = -1 { instance_destroy(teleporter_entrance); }
+    // if instance_exists(teleporter_exit) && teleporter_exit.state = -1 { instance_destroy(teleporter_exit); }
 
     sound_stop(sound_get("orb charging 1"));
 }
@@ -213,7 +170,7 @@ if (state == PS_HITSTUN || state == PS_HITSTUN_LAND || state == PS_TUMBLE || sta
 
 
 // Spawn Point ultimate
-if instance_exists(teleporter_ultimate) {
+if instance_exists(ult_instance) {
 	
 	// Find all dead teammates
 	with oPlayer {
@@ -224,32 +181,19 @@ if instance_exists(teleporter_ultimate) {
 	
 	var new_teammate_array = [];
 	with dead_teammates {
-		// Give dead players another stock
+		// Give dead players another stock.
         var current_stocks = get_player_stocks(id);
         if current_stocks <= 0 {set_player_stocks(id, 1);}
         
-        // Respawn the dead players
+        // Respawn the dead players.
         set_state(PS_RESPAWN);
-        x = other.teleporter_ultimate.x;
-        y = other.teleporter_ultimate.y - 16 - char_height/2;
+        x = other.ult_instance.x;
+        y = other.ult_instance.y - 16 - char_height/2;
         
         // Apply teleport shader
         outline_color = [other.sym_r0, other.sym_g0, other.sym_b0];
         init_shader();
 	}
-	// for (m = 0; m < array_length(dead_teammates); m++;) {
-		
-	// 	// Give dead players another stock
- //       var current_stocks = get_player_stocks(m);
- //       if current_stocks <= 0 {set_player_stocks(m, 1);}
-        
- //       // Respawn the dead players
- //       m.set_state(PS_RESPAWN);
- //       m.x = teleporter_ultimate.x;
- //       m.y = teleporter_ultimate.y - 16 - m.char_height/2;
-        
- //       // Apply teleport shader
- //       m.outline_color = [sym_r0, sym_g0, sym_b0];
     
     // Clear the array
     dead_teammates = [];
@@ -354,12 +298,3 @@ if array_length(dead_teammates) > 0 {
 //     	}
 //     }
 // }
-	return new_instance;
-}
-
-#define deployable_activate(old_instance) {
-	if (instance_exists(old_instance) && "state" in old_instance) {
-		old_instance.state = 0; // Set to idle
-		old_instance.state_timer = 0;
-	}
-}

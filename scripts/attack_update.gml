@@ -13,11 +13,15 @@ if (attack == AT_NSPECIAL || attack == AT_FSPECIAL || attack == AT_DSPECIAL || a
 // if joy_pad_idle != true {
 // 	weapon_aim = joy_dir;
 // }
-if has_rune_spawn_point && special_down && attack_down && ult_charge >= ult_cost {
-	attack = AT_EXTRA_2;
-	state_timer = 0;
-	window = 1;
-	window_timer = 0;
+
+// Trigger ultimate if possible.
+if special_down && attack_down && ult_charge >= ult_cost {
+	if has_rune_shield_gen || has_rune_spawn_point || has_rune_shield_wall {
+		attack = AT_EXTRA_2;
+		state_timer = 0;
+		window = 1;
+		window_timer = 0;
+	}
 }
 
 // One-time changes
@@ -556,66 +560,62 @@ switch(attack) {
         	break;
         
     case AT_USPECIAL:
+    	var tp_entrance = noone;
+    	var tp_exit = noone;
         switch(window) {
-            case 1:
-            	if instance_exists(teleporter_entrance) {	teleporter_entrance.state = 1;	spawn_hit_fx(teleporter_entrance.x,teleporter_entrance.y-32,HFX_GEN_OMNI);	tp_timer = tp_rate;}
-            	if instance_exists(teleporter_exit) {	teleporter_exit.state = 1;	spawn_hit_fx(teleporter_exit.x,teleporter_exit.y-32,HFX_GEN_OMNI); tp_timer = tp_rate;}
-            	// tpx_x = x + (192*spr_dir);
-				// tpx_xv = 0;
-				// tpx_y = y;
-            	break;
-            case 2:
-            	// if !instance_exists(teleporter_entrance) && !instance_exists(teleporter_exit) {
-            	// 	window = 3;
-             //       window_timer = 0;
-            	// }
-            	// Skip to window 3 if not pressing special
-                if (!special_down) {
-                	if (state_timer > 20) {
-                		window = 3;
-                		window_timer = 0;
-                	}
-                }
-                else {
-                	// If the previews don't exist, create the previews
-                    if (tp_timer <= 0 && window_timer == 1) {
-                    	if !instance_exists(teleporter_entrance) {
-                    		teleporter_entrance = instance_create(x,y,"obj_article2");
-                        	teleporter_entrance.type = "entrance";
-                        	// teleporter_entrance.state = -1;
-                        	array_insert(teleporters, 0, instance_find(teleporter_entrance, 1));
-                    	}
-                        if !instance_exists(teleporter_exit) {
-                        	teleporter_exit = instance_create(x + (39*spr_dir), y, "obj_article2");
-                        	teleporter_exit.type = "exit";
-                        	// teleporter_exit.state = -1;
-                        	array_insert(teleporters, 1, instance_find(teleporter_exit, 1));
-                        	sound_play(sound_get("preview"));
-                        }
-                    }
-                    if !instance_exists(teleporter_entrance) || !instance_exists(teleporter_exit) {
-                		move_cooldown[AT_USPECIAL] = 4;
-                    }
-                }
-                 
-                break;
-            case 3:
-            	if (tp_timer <= 0 && window_timer == 1 && instance_exists(teleporter_entrance) && instance_exists(teleporter_exit)) {
-            		if !teleporter_exit.free { //If teleporter exit is on the ground
-            			teleporter_entrance.state = 0;
-						teleporter_entrance.damage_cd = 0; //invulnerability ends
-                		teleporter_exit.state = 0;
-						teleporter_exit.damage_cd = 0; //invulnerability ends
-                		sound_play(sound_get("teleporter deployment 2"));
-                		// tp_timer = tp_rate;
-            		}
-            		else {
-            			teleporter_entrance.state = 1;
-            			teleporter_exit.state = 1;
+            case 1:	// Startup
+            	if window_timer == 1 { // Only execute on first frame.
+        			tp_entrance = teleporters[0];
+        			tp_exit = teleporters[1];
+            	
+            		// If teleporters exist...
+            		if instance_exists(tp_entrance) || instance_exists(tp_exit) {
+            			tp_timer = tp_rate; // Add time to cooldown timer.
+            			deployable_destroy_all(teleporters);
             		}
             	}
-            	else {
-            		// move_cooldown[AT_USPECIAL] = tp_timer;
+            	if window_timer == 6 && tp_timer <= 0 { // If teleporters are not on cooldown...
+                	if !instance_exists(tp_entrance) { // Create a preview of the entrance.
+                		tp_entrance = deployable_create(teleporters, "obj_article2", x, y);
+                    	// tp_entrance.type = "entrance";
+                	}
+                    if !instance_exists(tp_exit) { // Create a preview of the exit.
+                    	var x_offset = 64 *  spr_dir;
+                    	tp_exit = deployable_create(teleporters, "obj_article2", x + x_offset, y);
+                    	// tp_exit.type = "exit";
+                    } 
+                    if instance_exists(tp_entrance) && instance_exists(tp_exit) {
+                    	sound_play(sound_get("preview"));
+                	} 
+                	else {
+                		move_cooldown[AT_USPECIAL] = 4;	// Cancel if you can't create teleporters.
+                	}
+            	}
+            	break;
+            case 2:	// Preview placement
+        		if !special_down && state_timer > 20 {	// If special button released...
+            		window = 3;	// Switch to next attack window.
+            		window_timer = 0;
+                }
+                break;
+            case 3:	// Place and deploy
+            	if window_timer == 1 { // Only execute on first frame.
+            		// If teleporters are placed, grounded, and not on cooldown...
+	            	if tp_timer <= 0
+            		&& instance_exists(tp_entrance)
+            		&& !tp_entrance.free
+            		&& instance_exists(tp_exit)
+            		&& !tp_exit.free
+            		{
+            			tp_entrance.state = 0; // Deploy entrance.
+						tp_entrance.damage_cd = 0; // End invulnerability.
+            			tp_exit.state = 0; // Deploy exit.
+						tp_exit.damage_cd = 0; // End invulnerability.
+						sound_play(sound_get("teleporter deployment 2"));
+            		}
+	            	else {
+	            		deployable_destroy_all(teleporters);
+	            	}
             	}
         		break;
         }

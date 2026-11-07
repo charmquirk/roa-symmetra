@@ -23,7 +23,7 @@ if state == 0 { //if not deploying or destroyed
 }
 
 if ("health" in self) && health >= health_max {
-    state = 1;
+    state = 2;
     state_timer = 0;
     damage_cd = 0; //reset damage cooldown
     player_id.tp_timer = player_id.tp_rate;
@@ -34,22 +34,22 @@ if ("health" in self) && health >= health_max {
 // Re-initiates based on type, constantly checks.
 if state != 1 {
     switch(type) {
-        case "entrance" :
-            if ((instance_place(x,y,player_id.teleporter_exit) && state == 0) || !instance_exists(player_id.teleporter_exit) )  {       // Destroy teleporters if they collide or if the other gets destroyed
-                state = 1;
-                state_timer = 0;
-                // spawn_hit_fx(x, y - 16, 301);
-                // sound_play(sound_get("teleporter destroyed"))
-            }
-            break;
-        case "exit" :
-            if ((instance_place(x,y,player_id.teleporter_entrance) && state == 0) || !instance_exists(player_id.teleporter_entrance) ) {        // Destroy teleporters if they collide or if the other gets destroyed 
-                state = 1;
-                state_timer = 0;
-                // spawn_hit_fx(x, y - 16, 301);
-                // sound_play(sound_get("teleporter destroyed"))
-            }
-            break;
+        // case "entrance" :
+        //     if ((instance_place(x,y,player_id.teleporter_exit) && state == 0) || !instance_exists(player_id.teleporter_exit) )  {       // Destroy teleporters if they collide or if the other gets destroyed
+        //         state = 2;
+        //         state_timer = 0;
+        //         // spawn_hit_fx(x, y - 16, 301);
+        //         // sound_play(sound_get("teleporter destroyed"))
+        //     }
+        //     break;
+        // case "exit" :
+        //     if ((instance_place(x,y,player_id.teleporter_entrance) && state == 0) || !instance_exists(player_id.teleporter_entrance) ) {        // Destroy teleporters if they collide or if the other gets destroyed 
+        //         state = 2;
+        //         state_timer = 0;
+        //         // spawn_hit_fx(x, y - 16, 301);
+        //         // sound_play(sound_get("teleporter destroyed"))
+        //     }
+        //     break;
         case "ultimate" :
         	health_max = 120;
         	vsp = grav;
@@ -71,7 +71,7 @@ switch(state) {
     case -1 :
         if type == "entrance" || type == "ultimate" {
             x = player_id.x;
-            if !player_id.free { y = player_id.y; }
+            // if !player_id.free { y = player_id.y; }
         }
         break;
     case 0 :    //Default 
@@ -79,28 +79,62 @@ switch(state) {
         // if type == "entrance" || type == "exit" {sprite_index = sprite_get("teleporter_pad");}
         sprite_index = sprite_get("deployable");
         
-        // if state_timer >= lifetime { //TP expires
-        //     state = 1;
-        //     state_timer = 0;
-        // }
-        break;
-    case 1 :    //Destruction
-        spawn_hit_fx(x, y-32, HFX_GEN_OMNI);
-        if type == "ultimate" {sound_play(sound_get("teleporter destroyed"));}
-        
-        switch(type) {
-            case "entrance" :
-                player_id.teleporters[0] = noone;
-                player_id.teleporter_entrance = noone;
-                break;
-            case "exit" :
-                player_id.teleporters[1] = noone;
-                player_id.teleporter_exit = noone;
-                break;
+        // Expiration
+        if state_timer >= lifetime {
+            state = 2;
+            state_timer = 0;
         }
-        instance_destroy();
+        break;
+    case 1:	// Null
+    	break;
+    case 2 :    //Destruction
+    	spawn_hit_fx(x, y-32, HFX_GEN_OMNI);
+    	instance_destroy();
+        
+        // if type == "ultimate" {
+        // 	sound_play(sound_get("teleporter destroyed"));
+        // }
+        // else {
+        // 	player_id.deployable_destroy_all(player_id.teleporters);
+        // }
         exit;
         break;
 }
+
+
+// Alpha Animation & Sprite
+mask_index = sprite_get("teleporter_mask")
+var new_sprite = "";
+switch (state) {
+	case -1:
+		new_sprite = type == "ultimate" ? "spawn_point_preview" : "shield_generator_preview";
+		if image_alpha <= 1 {
+			image_alpha = state_timer * deploy_speed;
+		}
+		
+		if state_timer >= 2/deploy_speed { // If the state time is double what is needed to fade in.
+			state = 0;	// Activate
+	 		state_timer = 0;
+		}
+		break;
+	case 0:
+    case 1:
+    	image_alpha = damage_cd > 0 ? damage_alpha : 1;		// Translucent when invlunerable.
+        new_sprite = "deployable";
+        break;
+	case 2:
+		new_sprite = type == "ultimate" ? "spawn_point_preview" : "shield_generator_preview";
+		if image_alpha > 0 {
+			image_alpha -= deploy_speed;
+		}
+		
+		if state_timer >= 2/deploy_speed { // If the state time is double what is needed to fade out.
+			instance_destroy();
+            exit;
+		}
+		break;
+}
+if new_sprite != "" {	sprite_index = sprite_get(new_sprite);	}
+
 
 state_timer++;

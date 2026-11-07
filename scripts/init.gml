@@ -179,10 +179,11 @@ bubble_y = 8;
 ult_charge = 3600;
 ult_cost = 3600; // 2 minutes //Cost accounts for passive ultimate charge. 60 frames * 60 seconds * "X" minutes = time it takes to generate ultimate passively
 ult_sprite_foreground = "";
-if has_rune_spawn_point {ult_sprite_foreground = "ultimate_spawn_point";}
-if has_rune_shield_wall {ult_sprite_foreground = "ultimate_shield_wall";}
-if has_rune_shield_gen {ult_sprite_foreground = "ultimate_shield_gen";}
+if has_rune_spawn_point {   ult_sprite_foreground = "ultimate_spawn_point"; }
+if has_rune_shield_wall {   ult_sprite_foreground = "ultimate_shield_wall"; }
+if has_rune_shield_gen {    ult_sprite_foreground = "ultimate_shield_gen";  }
 ult_sprite_background = "ultimate_background"
+ult_instance = noone;
 
 // Barrier
 barrier_timer = 0;
@@ -303,10 +304,7 @@ player_count = 0
 orig_dash_speed = dash_speed;
 
 // Teleporter
-teleporters = [];
-teleporter_entrance = noone;
-teleporter_exit = noone;
-teleporter_ultimate = noone;
+teleporters = [noone, noone];
 tp_x = x;
 tp_xv = 0;
 tp_y = y;

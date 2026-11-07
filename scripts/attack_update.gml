@@ -34,333 +34,323 @@ switch(attack) {
         orb_v = 0;
     	break;
     	
-    case AT_EXTRA_2 : //ultimate
-    	if has_rune_spawn_point {
-    		switch(window) {
-				case 1:
-				break;
-            case 2:
-            	if !instance_exists(teleporter_ultimate) {
-            		teleporter_ultimate = instance_create(x, y, "obj_article2");
-                    teleporter_ultimate.type = "ultimate";
-                    teleporter_ultimate.state = -1;
-            	}
-            	    if special_pressed & !attack_pressed && state_timer > 6 { //place
-                		teleporter_ultimate.state = 0;
-                		teleporter_ultimate.damage_cd = 0;
-                		ult_charge = 0;
-                        sound_play(sound_get("teleporter deployment 2"));
-                        window = 3;
-                		window_timer = 0;
-                	}
-                	if attack_pressed & !special_pressed { //cancel placement
-                		instance_destroy(teleporter_ultimate);
-                		window = 3;
-                		window_timer = 0;
-                	}
-                break;
-            case 3:
-            	break;
-    		}
-    	}
+    case AT_EXTRA_2 : // Ultimate
+    	// if has_rune_spawn_point {
+     //   	if window == 2 && !instance_exists(teleporter_ultimate) {
+     //   		teleporter_ultimate = instance_create(x, y, "obj_article2");
+     //           teleporter_ultimate.type = "ultimate";
+     //           teleporter_ultimate.state = -1;
+        	
+    	//     if special_pressed & !attack_pressed && state_timer > 6 { //place
+     //   		teleporter_ultimate.state = 0;
+     //   		teleporter_ultimate.damage_cd = 0;
+     //   		ult_charge = 0;
+     //           sound_play(sound_get("teleporter deployment 2"));
+     //           window = 3;
+     //   		window_timer = 0;
+     //   	}
+     //   	if attack_pressed & !special_pressed { //cancel placement
+     //   		instance_destroy(teleporter_ultimate);
+     //   		window = 3;
+     //   		window_timer = 0;
+     //   	}
     	break;
-    
     	
     case AT_TAUNT:
     	if ammo < max_ammo {	set_attack(AT_EXTRA_1);   	} // Switch to reload if necessary.
     	break;
     	
-    case AT_JAB :
-        if !has_rune_beam_lock_on { // If stick beam
-        	switch(window) {
-            case 1:
-                aim_speed = 0;
-                weapon_aim = (90*(1-spr_dir));
-				beam_length = 0; //set to 0 to avoid visual glitches such as the beam extending pat targets
-                if (ammo <= 0) {	set_attack(AT_EXTRA_1);	} // Force reload if ammo is empty
-                break;
+    // case AT_JAB :
+    //     if !has_rune_beam_lock_on { // If stick beam
+    //     	switch(window) {
+    //         case 1:
+    //             aim_speed = 0;
+    //             weapon_aim = (90*(1-spr_dir));
+				// beam_length = 0; //set to 0 to avoid visual glitches such as the beam extending pat targets
+    //             if (ammo <= 0) {	set_attack(AT_EXTRA_1);	} // Force reload if ammo is empty
+    //             break;
 
-            case 2:
-            	beam_length = 0; // Reset beam length
+    //         case 2:
+    //         	beam_length = 0; // Reset beam length
             	
-            	if (ammo > 0) {	ammo--;	}		// Deplete ammo
-            	if ammo <= 0 {	beam_length = 0; }	// Hide beam if theres no ammo
+    //         	if (ammo > 0) {	ammo--;	}		// Deplete ammo
+    //         	if ammo <= 0 {	beam_length = 0; }	// Hide beam if theres no ammo
             	
-            	beam_list = []; 	// Clear list each tick. Prevents getting duplicates of the same person
+    //         	beam_list = []; 	// Clear list each tick. Prevents getting duplicates of the same person.
             	
-            	if attack_down && ammo > 0 {		// Aiming Mode. Lets you move the beam.
-            		if up_down || down_down {		// Aim up or down
-            			if up_down && !down_down{	aim_speed += aim_accel*spr_dir; }
-            			if down_down && !up_down {	aim_speed -= aim_accel*spr_dir;	}
-            		}
-            		else {
-            			if aim_speed > 0 || aim_speed < 0 { aim_speed = aim_speed*aim_decel; }	// Decellerate since you aren't aiming
-            		}
+    //         	if attack_down && ammo > 0 {		// Aiming Mode. Lets you move the beam.
+    //         		if up_down || down_down {		// Aim up or down
+    //         			if up_down && !down_down{	aim_speed += aim_accel*spr_dir; }
+    //         			if down_down && !up_down {	aim_speed -= aim_accel*spr_dir;	}
+    //         		}
+    //         		else {
+    //         			if aim_speed > 0 || aim_speed < 0 { aim_speed = aim_speed*aim_decel; }	// Decellerate since you aren't aiming
+    //         		}
             		
-            		aim_speed = clamp(aim_speed, -max_aim_speed, max_aim_speed);	// Aim speed maxes out
-            		weapon_aim += aim_speed;	// Weapon aim is modified by aim speed
-                    weapon_aim = (weapon_aim > 360) ? 0 : weapon_aim;	// Resets aim if you go past 360
-                    weapon_aim = (weapon_aim < 0) ? 360 : weapon_aim;	// Resets aim if you go below 0
-                    weapon_aim = clamp(weapon_aim, 0, 360);		// Closes degree range
-                    switch(spr_dir){	// Weapon can't be aimed past your head or behind you
-                    	case -1:
-                    		weapon_aim = clamp(weapon_aim, 90, 270);
-                    		break;
-                    	case 1:
-                    		if weapon_aim > 90 && weapon_aim < 180 {	weapon_aim = 90;	}
-                    		if weapon_aim < 270 && weapon_aim > 180 {	weapon_aim = 270;	}
-                    		break;
-                    }
-                    weapon_x = x - spr_dir*arm_offset_x + round((beam_offset)*dcos(weapon_aim));
-					weapon_y = y - arm_offset_y - round((beam_offset)*dsin(weapon_aim));
+    //         		aim_speed = clamp(aim_speed, -max_aim_speed, max_aim_speed);	// Aim speed maxes out
+    //         		weapon_aim += aim_speed;	// Weapon aim is modified by aim speed
+    //                 weapon_aim = (weapon_aim > 360) ? 0 : weapon_aim;	// Resets aim if you go past 360
+    //                 weapon_aim = (weapon_aim < 0) ? 360 : weapon_aim;	// Resets aim if you go below 0
+    //                 weapon_aim = clamp(weapon_aim, 0, 360);		// Closes degree range
+    //                 switch(spr_dir){	// Weapon can't be aimed past your head or behind you
+    //                 	case -1:
+    //                 		weapon_aim = clamp(weapon_aim, 90, 270);
+    //                 		break;
+    //                 	case 1:
+    //                 		if weapon_aim > 90 && weapon_aim < 180 {	weapon_aim = 90;	}
+    //                 		if weapon_aim < 270 && weapon_aim > 180 {	weapon_aim = 270;	}
+    //                 		break;
+    //                 }
+    //                 weapon_x = x - spr_dir*arm_offset_x + round((beam_offset)*dcos(weapon_aim));
+				// 	weapon_y = y - arm_offset_y - round((beam_offset)*dsin(weapon_aim));
 				
-                    beam_x_max = x - spr_dir*arm_offset_x + round((beam_offset + beam_max_range)*dcos(weapon_aim));
-                    beam_y_max = y - arm_offset_y - round((beam_offset + beam_max_range)*dsin(weapon_aim));
+    //                 beam_x_max = x - spr_dir*arm_offset_x + round((beam_offset + beam_max_range)*dcos(weapon_aim));
+    //                 beam_y_max = y - arm_offset_y - round((beam_offset + beam_max_range)*dsin(weapon_aim));
                     
-                    with oPlayer { // Scanning players
-						if (player != other.player && get_player_team(player) != get_player_team(other.player)) {	// If not me and not on my team
+    //                 with oPlayer { // Scanning players
+				// 		if (player != other.player && get_player_team(player) != get_player_team(other.player)) {	// If not me and not on my team
 							
-							var b_dist = distance_to_point(other.weapon_x, other.weapon_y);		// Document enemy distance from weapon
+				// 			var b_dist = distance_to_point(other.weapon_x, other.weapon_y);		// Document enemy distance from weapon
 							
-							if collision_line(other.weapon_x, other.weapon_y, other.beam_x_max, other.beam_y_max, self, false, false) {
+				// 			if collision_line(other.weapon_x, other.weapon_y, other.beam_x_max, other.beam_y_max, self, false, false) {
 								
-								if array_find_index(other.beam_list, b_dist) == -1 {	// If not in the list
-									array_push(other.beam_list, b_dist);		// Add to the list of people the beam can hit
-								}
-							}
-						}
-            		}
-            		if array_length(beam_list) > 0 {	// If there are eligible targets
-            			for (i = 0; i < array_length(beam_list); i++;) {	// Descend through list of eligible targets
-            				array_sort(beam_list, true);	// Sort list by distance
-            				// print_debug("sorted");
-            			}
-            			with oPlayer {
-            				if player != other.player && get_player_team(player) != get_player_team(other.player) {
-            				if collision_line(other.weapon_x, other.weapon_y, other.beam_x_max, other.beam_y_max, hurtboxID, false, false) {
-            				 	if distance_to_point(other.weapon_x, other.weapon_y) == other.beam_list[0] {
-            						other.beam_target = id;
-            					}
-            				}
-            				}
-            			}
+				// 				if array_find_index(other.beam_list, b_dist) == -1 {	// If not in the list
+				// 					array_push(other.beam_list, b_dist);		// Add to the list of people the beam can hit
+				// 				}
+				// 			}
+				// 		}
+    //         		}
+    //         		if array_length(beam_list) > 0 {	// If there are eligible targets
+    //         			for (i = 0; i < array_length(beam_list); i++;) {	// Descend through list of eligible targets
+    //         				array_sort(beam_list, true);	// Sort list by distance
+    //         				// print_debug("sorted");
+    //         			}
+    //         			with oPlayer {
+    //         				if player != other.player && get_player_team(player) != get_player_team(other.player) {
+    //         				if collision_line(other.weapon_x, other.weapon_y, other.beam_x_max, other.beam_y_max, hurtboxID, false, false) {
+    //         				 	if distance_to_point(other.weapon_x, other.weapon_y) == other.beam_list[0] {
+    //         						other.beam_target = id;
+    //         					}
+    //         				}
+    //         				}
+    //         			}
             			
-            		}
-            		else {
-            			beam_length = beam_preview_range;	// If no one in range, set beam length to preview
-            		}
+    //         		}
+    //         		else {
+    //         			beam_length = beam_preview_range;	// If no one in range, set beam length to preview
+    //         		}
             		
-            		if beam_target != noone {
-            			with beam_target {
-            			 		if !collision_line(other.weapon_x, other.weapon_y, other.beam_x_max, other.beam_y_max, self, false, false) || (invincible == true || state == PS_AIR_DODGE || state == PS_SPAWN || state == PS_DEAD || state == PS_RESPAWN || state == PS_ROLL_BACKWARD || state == PS_ROLL_FORWARD || state == PS_WALL_TECH) { //If target should be unable to hit
-            						other.beam_target = noone;
-            						other.beam_chip = 0;
-            			 		}
-            			 		else {
-            			 			if (other.charge < other.charge_max) {		// If not at max charge
-            							other.charge += min(other.charge_max - other.charge, 1);	// Charge beam
-            							other.charge = clamp(other.charge, 0, other.charge_max);
-        							}
-            			 			other.beam_chip++;
+    //         		if beam_target != noone {
+    //         			with beam_target {
+    //         			 		if !collision_line(other.weapon_x, other.weapon_y, other.beam_x_max, other.beam_y_max, self, false, false) || (invincible == true || state == PS_AIR_DODGE || state == PS_SPAWN || state == PS_DEAD || state == PS_RESPAWN || state == PS_ROLL_BACKWARD || state == PS_ROLL_FORWARD || state == PS_WALL_TECH) { //If target should be unable to hit
+    //         						other.beam_target = noone;
+    //         						other.beam_chip = 0;
+    //         			 		}
+    //         			 		else {
+    //         			 			if (other.charge < other.charge_max) {		// If not at max charge
+    //         							other.charge += min(other.charge_max - other.charge, 1);	// Charge beam
+    //         							other.charge = clamp(other.charge, 0, other.charge_max);
+    //     							}
+    //         			 			other.beam_chip++;
             			 			
-            			 			other.beam_length = distance_to_point(other.weapon_x, other.weapon_y);
-    							}
-            			}
-            			if beam_chip >= beam_chip_threshold {
-            			 	// spawn_hit_fx(beam_target.x, beam_target.y - beam_target.char_height/2, cfx_beam_fire);
-            			 	take_damage(beam_target.player, player, 1);
-            			 	beam_chip = 0;
-            			}
+    //         			 			other.beam_length = distance_to_point(other.weapon_x, other.weapon_y);
+    // 							}
+    //         			}
+    //         			if beam_chip >= beam_chip_threshold {
+    //         			 	// spawn_hit_fx(beam_target.x, beam_target.y - beam_target.char_height/2, cfx_beam_fire);
+    //         			 	take_damage(beam_target.player, player, 1);
+    //         			 	beam_chip = 0;
+    //         			}
             			
-            		}
-            		else {
-            			// if charge > 0 { charge -= charge_decay; }
-            			clamp(charge, 0, charge_max)
-            			beam_chip = 0;
-            			beam_length = beam_preview_range;
-            		}
+    //         		}
+    //         		else {
+    //         			// if charge > 0 { charge -= charge_decay; }
+    //         			clamp(charge, 0, charge_max)
+    //         			beam_chip = 0;
+    //         			beam_length = beam_preview_range;
+    //         		}
             		
-            		// if beam_target == noone {	beam_length = beam_preview_range;	}	// overwrite and set to preview
-            		beam_x = x - spr_dir*arm_offset_x + round((beam_offset + beam_length)*dcos(weapon_aim));		// Finds the point on the circle where the x coordinate of the tip would be
-					beam_y = y - arm_offset_y - round((beam_offset + beam_length)*dsin(weapon_aim));		// Finds the point on the circle where the y coordinate of the tip would be
+    //         		// if beam_target == noone {	beam_length = beam_preview_range;	}	// overwrite and set to preview
+    //         		beam_x = x - spr_dir*arm_offset_x + round((beam_offset + beam_length)*dcos(weapon_aim));		// Finds the point on the circle where the x coordinate of the tip would be
+				// 	beam_y = y - arm_offset_y - round((beam_offset + beam_length)*dsin(weapon_aim));		// Finds the point on the circle where the y coordinate of the tip would be
             		
-            	}
-                else {
-                	window = 3;
-                	window_timer = 0;
-                }
-                // Auto-lock charges
-                if (charge < charge_2) { beam_chip_threshold = beam_chip_1; }
-				if (charge >= charge_2 && charge < charge_3) { beam_chip_threshold = beam_chip_2; }
-				if (charge >= charge_3 ) { beam_chip_threshold = beam_chip_3; }
+    //         	}
+    //             else {
+    //             	window = 3;
+    //             	window_timer = 0;
+    //             }
+    //             // Auto-lock charges
+    //             if (charge < charge_2) { beam_chip_threshold = beam_chip_1; }
+				// if (charge >= charge_2 && charge < charge_3) { beam_chip_threshold = beam_chip_2; }
+				// if (charge >= charge_3 ) { beam_chip_threshold = beam_chip_3; }
 					
                 
-                break;
-            case 3:
-            	beam_target = noone;
-                aim_speed = 0;  // reset aim speed
-                weapon_aim = (90*(1-spr_dir)); // set weapon aim to directly in front of you
-				beam_length = 0; //set to 0 to avoid visual glitches such as the beam extending pat targets
-                beam_list = [];
-                break;
-        }
-        break;
-	    }
-	    else {
-	    	switch(window) {
-	            case 1:
-	            	aim_speed = 0;
-	                weapon_aim = (90*(1-spr_dir));
-					beam_length = 0; // Set to 0 to avoid visual glitches such as the beam extending past targets
-					beam_x = x - spr_dir*arm_offset_x + round((beam_offset + beam_length)*dcos(weapon_aim));		// Finds the point on the circle where the x coordinate of the tip would be
-					beam_y = y - arm_offset_y - round((beam_offset + beam_length)*dsin(weapon_aim));		// Finds the point on the circle where the y coordinate of the tip would be
-	                if (ammo <= 0) {	set_attack(AT_EXTRA_1);	} // Force reload if ammo is empty
-	                break;
-	            case 2:
-	            	// beam_length = 0; // Reset beam length
-	            	if (ammo > 0) {	ammo--;	}		// Deplete ammo
-	            	if ammo <= 0 {	beam_length = 0; }	// Hide beam if theres no ammo
+    //             break;
+    //         case 3:
+    //         	beam_target = noone;
+    //             aim_speed = 0;  // reset aim speed
+    //             weapon_aim = (90*(1-spr_dir)); // set weapon aim to directly in front of you
+				// beam_length = 0; //set to 0 to avoid visual glitches such as the beam extending pat targets
+    //             beam_list = [];
+    //             break;
+    //     }
+    //     break;
+	   // }
+	   // else {
+	   // 	switch(window) {
+	   //         case 1:
+	   //         	aim_speed = 0;
+	   //             weapon_aim = (90*(1-spr_dir));
+				// 	beam_length = 0; // Set to 0 to avoid visual glitches such as the beam extending past targets
+				// 	beam_x = x - spr_dir*arm_offset_x + round((beam_offset + beam_length)*dcos(weapon_aim));		// Finds the point on the circle where the x coordinate of the tip would be
+				// 	beam_y = y - arm_offset_y - round((beam_offset + beam_length)*dsin(weapon_aim));		// Finds the point on the circle where the y coordinate of the tip would be
+	   //             if (ammo <= 0) {	set_attack(AT_EXTRA_1);	} // Force reload if ammo is empty
+	   //             break;
+	   //         case 2:
+	   //         	// beam_length = 0; // Reset beam length
+	   //         	if (ammo > 0) {	ammo--;	}		// Deplete ammo
+	   //         	if ammo <= 0 {	beam_length = 0; }	// Hide beam if theres no ammo
 	            	
-	            	// beam_list = []; 	// Clear list each tick. Prevents getting duplicates of the same person
+	   //         	// beam_list = []; 	// Clear list each tick. Prevents getting duplicates of the same person
 	            	
 	            	
-	            	if attack_down && ammo > 0 {		// Aiming Mode. Lets you move the beam, even while locked on!
+	   //         	if attack_down && ammo > 0 {		// Aiming Mode. Lets you move the beam, even while locked on!
 	            		
-	            		if up_down || down_down {		// Aim up or down
-	            			beam_target = noone;
-	            			if up_down && !down_down{	aim_speed += aim_accel*spr_dir; }
-	            			if down_down && !up_down {	aim_speed -= aim_accel*spr_dir;	}
-	            		}
-	            		else {
-	            			if aim_speed > 0 || aim_speed < 0 { aim_speed = aim_speed*aim_decel; }	// Decellerate since you aren't aiming
-	            		}
+	   //         		if up_down || down_down {		// Aim up or down
+	   //         			beam_target = noone;
+	   //         			if up_down && !down_down{	aim_speed += aim_accel*spr_dir; }
+	   //         			if down_down && !up_down {	aim_speed -= aim_accel*spr_dir;	}
+	   //         		}
+	   //         		else {
+	   //         			if aim_speed > 0 || aim_speed < 0 { aim_speed = aim_speed*aim_decel; }	// Decellerate since you aren't aiming
+	   //         		}
 	            		
-						aim_speed = clamp(aim_speed, -max_aim_speed, max_aim_speed);	// Aim speed maxes out
-						weapon_aim += aim_speed;	// Weapon aim is modified by aim speed
-	                    weapon_aim = (weapon_aim > 360) ? 0 : weapon_aim;	// Resets aim if you go past 360
-	                    weapon_aim = (weapon_aim < 0) ? 360 : weapon_aim;	// Resets aim if you go below 0
-	                    weapon_aim = clamp(weapon_aim, 0, 360);		// Closes degree range
+				// 		aim_speed = clamp(aim_speed, -max_aim_speed, max_aim_speed);	// Aim speed maxes out
+				// 		weapon_aim += aim_speed;	// Weapon aim is modified by aim speed
+	   //                 weapon_aim = (weapon_aim > 360) ? 0 : weapon_aim;	// Resets aim if you go past 360
+	   //                 weapon_aim = (weapon_aim < 0) ? 360 : weapon_aim;	// Resets aim if you go below 0
+	   //                 weapon_aim = clamp(weapon_aim, 0, 360);		// Closes degree range
 	                    
 	                    
-	                	// if (weapon_aim == 90 && spr_dir == -1) || (weapon_aim == 270 && spr_dir == 1) {aim_speed = clamp(aim_speed, 0, max_aim_speed); }//Clamp to prevent beam from going behind the head
-						// if (weapon_aim == 270 && spr_dir == -1) || (weapon_aim == 90 && spr_dir == 1){aim_speed = clamp(aim_speed,-max_aim_speed, 0); }//Clamp to prevent beam from going behind the back
+	   //             	// if (weapon_aim == 90 && spr_dir == -1) || (weapon_aim == 270 && spr_dir == 1) {aim_speed = clamp(aim_speed, 0, max_aim_speed); }//Clamp to prevent beam from going behind the head
+				// 		// if (weapon_aim == 270 && spr_dir == -1) || (weapon_aim == 90 && spr_dir == 1){aim_speed = clamp(aim_speed,-max_aim_speed, 0); }//Clamp to prevent beam from going behind the back
 	                   
 	                    
-						if beam_target == noone { // If there isn't a beam target
-							beam_list = [] // Clear beam list each frame to prevent duplicates
-							switch(spr_dir){	// Weapon can't be aimed past your head or behind you
-								case -1:
-									weapon_aim = clamp(weapon_aim, 90, 270);
-									break;
-								case 1:
-									if weapon_aim >= 90 && weapon_aim <= 180 {	weapon_aim = 90;	}
-									if weapon_aim <= 270 && weapon_aim >= 180 {	weapon_aim = 270;	}
-									break;
-								break;
-	                    	}
-	                		weapon_x = x - spr_dir*arm_offset_x + round((beam_offset)*dcos(weapon_aim)); // X location of the start of the beam
-							weapon_y = y - arm_offset_y - round((beam_offset)*dsin(weapon_aim)); // Y location of the start of the beam
-							beam_x_max = x - spr_dir*arm_offset_x + round((beam_offset + beam_max_range)*dcos(weapon_aim)); // X location of the end of the beam
-							beam_y_max = y - arm_offset_y - round((beam_offset + beam_max_range)*dsin(weapon_aim)); // Y location of the end of the beam
-	                    	// switch(spr_dir) {	// switch direction
-	                    	// 	case -1:	if (weapon_aim < 90 && weapon_aim >= 0) || (weapon_aim <= 360 && weapon_aim > 270) {spr_dir = 1;} break;
-	                    	// 	case 1:		if weapon_aim > 90 && weapon_aim < 270 {spr_dir = -1;}	break;
-	                    	// }
-							with oPlayer { // Scan players
-								if (player != other.player && get_player_team(player) != get_player_team(other.player)) {	// If not me and not on my team
-									var b_dist = point_distance(x, y - (char_height/2), other.weapon_x, other.weapon_y);		// Document enemy distance from weapon
-									//var b_dist = distance_to_point(other.weapon_x, other.weapon_y);
-									if collision_line(other.weapon_x, other.weapon_y, other.beam_x_max, other.beam_y_max, self, false, false) && b_dist < other.beam_max_range { // && b_dist > other.arm_offset_y
-										if array_find_index(other.beam_list, b_dist) == -1 {	// If not in the list
-											array_push(other.beam_list, b_dist);		// Add to the list of people the beam can hit
-										}
-									}
-								}
-							}
-							if array_length(beam_list) > 0 {	// If there are eligible targets
-	            				for (i = 0; i < array_length(beam_list); i++;) {	// Descend through list of eligible targets
-	            					array_sort(beam_list, true);	// Sort list by distance
-	            				}
-	            				with oPlayer {
-	            					if player != other.player && get_player_team(player) != get_player_team(other.player) {
-	            						if collision_line(other.weapon_x, other.weapon_y, other.beam_x_max, other.beam_y_max, hurtboxID, false, false) {
-	            				 			if point_distance(x, y - (char_height/2), other.weapon_x, other.weapon_y) == other.beam_list[0] { // If distance between the start of the beam and the midline of the enemy match
-	            				 			// if distance_to_point(other.weapon_x, other.weapon_y) == other.beam_list[0] {
-	            								other.beam_target = id;
-	            							}
-	            						}
-	            					}
-	            				}
-	            			}
-	            			else {
-	            				beam_length = beam_preview_range;	// If no one in range, set beam length to preview
-	            			}
-	            			if charge > 0 { charge -= charge_decay; }
-	            			clamp(charge, 0, charge_max)
-	            			beam_chip = 0;
-	            			beam_length = beam_preview_range;
+				// 		if beam_target == noone { // If there isn't a beam target
+				// 			beam_list = [] // Clear beam list each frame to prevent duplicates
+				// 			switch(spr_dir){	// Weapon can't be aimed past your head or behind you
+				// 				case -1:
+				// 					weapon_aim = clamp(weapon_aim, 90, 270);
+				// 					break;
+				// 				case 1:
+				// 					if weapon_aim >= 90 && weapon_aim <= 180 {	weapon_aim = 90;	}
+				// 					if weapon_aim <= 270 && weapon_aim >= 180 {	weapon_aim = 270;	}
+				// 					break;
+				// 				break;
+	   //                 	}
+	   //             		weapon_x = x - spr_dir*arm_offset_x + round((beam_offset)*dcos(weapon_aim)); // X location of the start of the beam
+				// 			weapon_y = y - arm_offset_y - round((beam_offset)*dsin(weapon_aim)); // Y location of the start of the beam
+				// 			beam_x_max = x - spr_dir*arm_offset_x + round((beam_offset + beam_max_range)*dcos(weapon_aim)); // X location of the end of the beam
+				// 			beam_y_max = y - arm_offset_y - round((beam_offset + beam_max_range)*dsin(weapon_aim)); // Y location of the end of the beam
+	   //                 	// switch(spr_dir) {	// switch direction
+	   //                 	// 	case -1:	if (weapon_aim < 90 && weapon_aim >= 0) || (weapon_aim <= 360 && weapon_aim > 270) {spr_dir = 1;} break;
+	   //                 	// 	case 1:		if weapon_aim > 90 && weapon_aim < 270 {spr_dir = -1;}	break;
+	   //                 	// }
+				// 			with oPlayer { // Scan players
+				// 				if (player != other.player && get_player_team(player) != get_player_team(other.player)) {	// If not me and not on my team
+				// 					var b_dist = point_distance(x, y - (char_height/2), other.weapon_x, other.weapon_y);		// Document enemy distance from weapon
+				// 					//var b_dist = distance_to_point(other.weapon_x, other.weapon_y);
+				// 					if collision_line(other.weapon_x, other.weapon_y, other.beam_x_max, other.beam_y_max, self, false, false) && b_dist < other.beam_max_range { // && b_dist > other.arm_offset_y
+				// 						if array_find_index(other.beam_list, b_dist) == -1 {	// If not in the list
+				// 							array_push(other.beam_list, b_dist);		// Add to the list of people the beam can hit
+				// 						}
+				// 					}
+				// 				}
+				// 			}
+				// 			if array_length(beam_list) > 0 {	// If there are eligible targets
+	   //         				for (i = 0; i < array_length(beam_list); i++;) {	// Descend through list of eligible targets
+	   //         					array_sort(beam_list, true);	// Sort list by distance
+	   //         				}
+	   //         				with oPlayer {
+	   //         					if player != other.player && get_player_team(player) != get_player_team(other.player) {
+	   //         						if collision_line(other.weapon_x, other.weapon_y, other.beam_x_max, other.beam_y_max, hurtboxID, false, false) {
+	   //         				 			if point_distance(x, y - (char_height/2), other.weapon_x, other.weapon_y) == other.beam_list[0] { // If distance between the start of the beam and the midline of the enemy match
+	   //         				 			// if distance_to_point(other.weapon_x, other.weapon_y) == other.beam_list[0] {
+	   //         								other.beam_target = id;
+	   //         							}
+	   //         						}
+	   //         					}
+	   //         				}
+	   //         			}
+	   //         			else {
+	   //         				beam_length = beam_preview_range;	// If no one in range, set beam length to preview
+	   //         			}
+	   //         			if charge > 0 { charge -= charge_decay; }
+	   //         			clamp(charge, 0, charge_max)
+	   //         			beam_chip = 0;
+	   //         			beam_length = beam_preview_range;
 	            			
-	            			beam_x = x - spr_dir*arm_offset_x + round((beam_offset + beam_length)*dcos(weapon_aim));		// Finds the point on the circle where the x coordinate of the tip would be
-							beam_y = y - arm_offset_y - round((beam_offset + beam_length)*dsin(weapon_aim));		// Finds the point on the circle where the y coordinate of the tip would be
-	            		}
-	            		else { // If there is a beam target
-	            			beam_list = [];
-	            			weapon_x = x - spr_dir*arm_offset_x + round((beam_offset)*dcos(weapon_aim)); // X location of the start of the beam
-							weapon_y = y - arm_offset_y - round((beam_offset)*dsin(weapon_aim)); // Y location of the start of the beam
-							beam_x_max = x - spr_dir*arm_offset_x + round((beam_offset + beam_max_range)*dcos(weapon_aim)); // X location of the end of the beam
-							beam_y_max = y - arm_offset_y - round((beam_offset + beam_max_range)*dsin(weapon_aim)); // Y location of the end of the beam
-	            			with beam_target {
-	            			 	if other.beam_length > other.beam_max_range || (invincible == true || state == PS_AIR_DODGE || state == PS_SPAWN || state == PS_DEAD || state == PS_RESPAWN || state == PS_ROLL_BACKWARD || state == PS_ROLL_FORWARD || state == PS_WALL_TECH) { //If target is inside the weapon, out of range, or unable to hit
-	            					other.beam_target = noone;
-	            					other.beam_chip = 0;
-	            					other.weapon_aim = (90*(1-other.spr_dir)); //other.beam_length <= other.arm_offset_y ||
-	            			 	}
-	            			 	else {
-	            			 		if (other.charge < other.charge_max) {		// If not at max charge
-	            						other.charge += min(other.charge_max - other.charge, 1);	// Charge beam
-	            						other.charge = clamp(other.charge, 0, other.charge_max);
-	        						}
-	            			 		other.beam_chip++;
-	            			 		other.beam_x = x;
-	            			 		other.beam_y = y - (char_height/2);
-	            			 		other.beam_length = point_distance(other.weapon_x, other.weapon_y, other.beam_x, other.beam_y);
-	            			 		// other.weapon_aim = point_direction(other.weapon_x, other.weapon_y, other.beam_x, other.beam_y);
-	            			 		other.weapon_aim = point_direction(other.x - other.spr_dir*other.arm_offset_x, other.y-other.arm_offset_y, other.beam_x, other.beam_y);
-	            			 		if other.weapon_aim > 90 && other.weapon_aim < 270 {other.spr_dir = -1;}
-	            			 		if other.weapon_aim < 90 || other.weapon_aim > 270 {other.spr_dir = 1;}
-	    							}
-	            			}
-	            			if beam_chip >= beam_chip_threshold {
-	            			 	take_damage(beam_target.player, player, 1);
-	            			 	beam_chip = 0;
-	            			}
-						}
-						// if beam_target == noone {	beam_length = beam_preview_range;	}	// overwrite and set to preview
+	   //         			beam_x = x - spr_dir*arm_offset_x + round((beam_offset + beam_length)*dcos(weapon_aim));		// Finds the point on the circle where the x coordinate of the tip would be
+				// 			beam_y = y - arm_offset_y - round((beam_offset + beam_length)*dsin(weapon_aim));		// Finds the point on the circle where the y coordinate of the tip would be
+	   //         		}
+	   //         		else { // If there is a beam target
+	   //         			beam_list = [];
+	   //         			weapon_x = x - spr_dir*arm_offset_x + round((beam_offset)*dcos(weapon_aim)); // X location of the start of the beam
+				// 			weapon_y = y - arm_offset_y - round((beam_offset)*dsin(weapon_aim)); // Y location of the start of the beam
+				// 			beam_x_max = x - spr_dir*arm_offset_x + round((beam_offset + beam_max_range)*dcos(weapon_aim)); // X location of the end of the beam
+				// 			beam_y_max = y - arm_offset_y - round((beam_offset + beam_max_range)*dsin(weapon_aim)); // Y location of the end of the beam
+	   //         			with beam_target {
+	   //         			 	if other.beam_length > other.beam_max_range || (invincible == true || state == PS_AIR_DODGE || state == PS_SPAWN || state == PS_DEAD || state == PS_RESPAWN || state == PS_ROLL_BACKWARD || state == PS_ROLL_FORWARD || state == PS_WALL_TECH) { //If target is inside the weapon, out of range, or unable to hit
+	   //         					other.beam_target = noone;
+	   //         					other.beam_chip = 0;
+	   //         					other.weapon_aim = (90*(1-other.spr_dir)); //other.beam_length <= other.arm_offset_y ||
+	   //         			 	}
+	   //         			 	else {
+	   //         			 		if (other.charge < other.charge_max) {		// If not at max charge
+	   //         						other.charge += min(other.charge_max - other.charge, 1);	// Charge beam
+	   //         						other.charge = clamp(other.charge, 0, other.charge_max);
+	   //     						}
+	   //         			 		other.beam_chip++;
+	   //         			 		other.beam_x = x;
+	   //         			 		other.beam_y = y - (char_height/2);
+	   //         			 		other.beam_length = point_distance(other.weapon_x, other.weapon_y, other.beam_x, other.beam_y);
+	   //         			 		// other.weapon_aim = point_direction(other.weapon_x, other.weapon_y, other.beam_x, other.beam_y);
+	   //         			 		other.weapon_aim = point_direction(other.x - other.spr_dir*other.arm_offset_x, other.y-other.arm_offset_y, other.beam_x, other.beam_y);
+	   //         			 		if other.weapon_aim > 90 && other.weapon_aim < 270 {other.spr_dir = -1;}
+	   //         			 		if other.weapon_aim < 90 || other.weapon_aim > 270 {other.spr_dir = 1;}
+	   // 							}
+	   //         			}
+	   //         			if beam_chip >= beam_chip_threshold {
+	   //         			 	take_damage(beam_target.player, player, 1);
+	   //         			 	beam_chip = 0;
+	   //         			}
+				// 		}
+				// 		// if beam_target == noone {	beam_length = beam_preview_range;	}	// overwrite and set to preview
 						
-	            	}
-	                else {
-	                	window = 3;
-	                	window_timer = 0;
-	                }
+	   //         	}
+	   //             else {
+	   //             	window = 3;
+	   //             	window_timer = 0;
+	   //             }
 	            
-					// Auto-lock charges
-	                if (charge < charge_2) { beam_chip_threshold = beam_chip_1; }
-					if (charge >= charge_2 && charge < charge_3) { beam_chip_threshold = beam_chip_2; }
-					if (charge >= charge_3 ) { beam_chip_threshold = beam_chip_3; }
-	            	break;
-	            case 3:
-	            	beam_target = noone;
-	                aim_speed = 0; // reset aim speed
-	                weapon_aim = (90*(1-spr_dir)); // set weapon aim to directly in front of you
-					beam_length = 0; //set to 0 to avoid visual glitches such as the beam extending pat targets
-	                beam_list = [];
-	                break;
-	        }
-	        break;
-	    }
+				// 	// Auto-lock charges
+	   //             if (charge < charge_2) { beam_chip_threshold = beam_chip_1; }
+				// 	if (charge >= charge_2 && charge < charge_3) { beam_chip_threshold = beam_chip_2; }
+				// 	if (charge >= charge_3 ) { beam_chip_threshold = beam_chip_3; }
+	   //         	break;
+	   //         case 3:
+	   //         	beam_target = noone;
+	   //             aim_speed = 0; // reset aim speed
+	   //             weapon_aim = (90*(1-spr_dir)); // set weapon aim to directly in front of you
+				// 	beam_length = 0; //set to 0 to avoid visual glitches such as the beam extending pat targets
+	   //             beam_list = [];
+	   //             break;
+	   //     }
+	   //     break;
+	   // }
 
         
-    case AT_FSPECIAL :
+    case AT_FSPECIAL :	// Barrier
     	switch(window) {
     		case 1:
     			if (barrier_timer > 0 || barrier_placing == true) {
@@ -370,21 +360,21 @@ switch(attack) {
     				reset_hitbox_value(AT_FSPECIAL, 1, HG_WINDOW_CREATION_FRAME);
     			}
     			// if up_down || down_down {
-       //         		if up_down {
-       //         			set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_VSPEED, -1);
-       //         			set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_HSPEED, 1);
-       //         		}
-       //         		if down_down {
-       //         			set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_HSPEED, 0);
-       //         			set_hitbox_value(AT_FSPECIAL, 1, HG_LIFETIME, 360);
-       //         			// set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_HSPEED, 1);
-       //         		}
+      //         		if up_down {
+      //         			set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_VSPEED, -1);
+      //         			set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_HSPEED, 1);
+      //         		}
+      //         		if down_down {
+      //         			set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_HSPEED, 0);
+      //         			set_hitbox_value(AT_FSPECIAL, 1, HG_LIFETIME, 360);
+      //         			// set_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_HSPEED, 1);
+      //         		}
                 		
-       //         }
-       //         else {
-                	reset_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_VSPEED);
-                	reset_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_HSPEED);
-                	reset_hitbox_value(AT_FSPECIAL, 1, HG_LIFETIME);
+      //         }
+      //         else {
+                	// reset_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_VSPEED);
+                	// reset_hitbox_value(AT_FSPECIAL, 1, HG_PROJECTILE_HSPEED);
+                	// reset_hitbox_value(AT_FSPECIAL, 1, HG_LIFETIME);
                 // }
     			
     			break;
@@ -429,11 +419,8 @@ switch(attack) {
       //      if right_down && !left_down && spr_dir == -1 { spr_dir = 1; weapon_aim = (90*(1-spr_dir));}
 			// weapon_aim = (spr_dir == 1 && left_down && !right_down) ? (90*(1-spr_dir)) : weapon_aim; // If facing right
 		
-            
-    		if window != 4 && (up_down || down_down) {			// Aiming Mode disabled during release window
-            	if up_down && !down_down{	aim_speed += aim_accel*spr_dir;}
-            	if down_down && !up_down {	aim_speed -= aim_accel*spr_dir;}
-            }
+            var v_dir = up_down - down_down;
+    		if window != 4 { aim_speed += aim_accel*spr_dir*v_dir; }			// Aiming Mode disabled during release window
             else { if aim_speed > 0 || aim_speed < 0 { aim_speed = aim_speed*aim_decel; }}	// Decelerate if you aren't aiming
             
         	weapon_x = x - spr_dir*arm_offset_x + round((beam_offset)*dcos(weapon_aim)); //Set weapon x location for where the orb will fire from
@@ -497,7 +484,7 @@ switch(attack) {
             		
             		
             	}
-            	else {
+            	else if state_timer > 8 {
             		window = 4;
             		window_timer = 0;
             	}
@@ -555,9 +542,9 @@ switch(attack) {
         }
         break;
         
-        case AT_NAIR:
-        	set_attack(AT_JAB);
-        	break;
+    // case AT_NAIR:
+    // 	set_attack(AT_JAB);		// Use beam in the air.
+    // 	break;
         
     case AT_USPECIAL:
     	var tp_entrance = noone;
@@ -629,9 +616,8 @@ switch(attack) {
         			if has_rune_more_turrets {
         				turrets = deployable_destroy(turrets, turrets[0]); // Destroy oldest turret, if possible.
         			}
-        			else{
-        				turrets = deployable_destroy_all(turrets);
-        				move_cooldown[AT_DSPECIAL] = 4;	// Add cooldown if it's only one turret.
+        			else {
+    					turrets = deployable_destroy_all(turrets);
         			}
         		}
         		break;
@@ -659,9 +645,21 @@ switch(attack) {
 						new_turret.can_be_grounded = !free;
 	            		new_turret.is_healing = has_rune_turret_heal;
 	            		new_turret.is_weak_turret = has_rune_more_turrets;
-	            		turret_timer += turret_rate;
+	            		new_turret.aim_range = new_turret.is_weak_turret ? 32*5 : 32*8;
+	            		new_turret.health_max = new_turret.is_weak_turret ? 16 : 64;
+	            		new_turret.lifetime = new_turret.is_weak_turret ? turret_rate*2 : turret_rate;
+	            		new_turret.chip_damage = new_turret.is_healing ? -1 : 1;
+	            		switch new_turret.is_weak_turret {
+							case true:
+								new_turret.chip_threshold = new_turret.is_healing ? 40 : 20;
+								break;
+							case false:
+								new_turret.chip_threshold = new_turret.is_healing ? 20 : 10;
+								break;
+						}
 	        			turret_charges--;
 	                	move_cooldown[AT_DSPECIAL] = 4; //Cooldown before placing next turret
+	                	turret_timer += turret_rate;
             		}
             		else {	print_debug("ERROR: Failed to create sentry turret!");	}
 			    }

@@ -5,33 +5,29 @@
  */
 
 
-
-
-
-
 // STAT NAME		ZETTER VALUE   BASECAST RANGE   NOTES
 
-// Runes
-has_rune_remote_place   = has_rune("A")
-has_rune_more_turrets   = has_rune("B")
-has_rune_turret_proj    = has_rune("C")
-has_rune_beam_lock_on   = has_rune("D")
-has_rune_beam_lifesteal = has_rune("E")
-has_rune_shield_health  = has_rune("F")
-has_rune_tp_exit        = has_rune("G")
-has_rune_tp_airborne    = has_rune("H")
-has_rune_orb_scaling    = has_rune("I")
-has_rune_beam_heal      = has_rune("J")
-has_rune_long_dodge     = has_rune("K")
-has_rune_spawn_point    = has_rune("L")
-has_rune_shield_wall    = has_rune("M")
-has_rune_shield_gen     = has_rune("N")
-has_rune_turret_heal    = has_rune("O")
 
+// Runes
+has_rune_remote_place   = has_rune("A");
+has_rune_more_turrets   = has_rune("B");
+has_rune_turret_proj    = has_rune("C");
+has_rune_beam_lock_on   = has_rune("D");
+has_rune_beam_lifesteal = has_rune("E");
+has_rune_shield_health  = has_rune("F");
+has_rune_tp_exit        = has_rune("G");
+has_rune_tp_airborne    = has_rune("H");
+has_rune_orb_scaling    = has_rune("I");
+has_rune_beam_heal      = has_rune("J");
+has_rune_long_dodge     = has_rune("K");
+has_rune_spawn_point    = has_rune("L");
+has_rune_shield_wall    = has_rune("M");
+has_rune_shield_gen     = has_rune("N");
+has_rune_turret_heal    = has_rune("O");
 
 
 // Physical size
-char_height         = 64;       //                  not zetterburn's. this is just cosmetic anyway
+char_height         = 50;       //                  not zetterburn's. this is just cosmetic anyway
 knockback_adj       = 1;		// 0.9  -  1.2
 
 // Ground movement
@@ -84,7 +80,6 @@ air_dodge_speed     = has_rune_long_dodge ? 16 : 8; // 7.5   - 8
 techroll_speed      = 10;       // 8    -  11
 
 
-
 // Animation Info
 
 // Misc. animation speeds
@@ -118,8 +113,6 @@ air_dodge_startup_frames    = 1;
 air_dodge_active_frames     = 5;
 air_dodge_recovery_frames   = 1;
 
-
-
 // Roll
 roll_forward_startup_frames     = 1;
 roll_forward_active_frames      = 4;
@@ -133,6 +126,7 @@ crouch_startup_frames   = 2;
 crouch_active_frames    = 8;
 crouch_recovery_frames  = 2;
 
+
 /*
 
 Muno's Words of Wisdom: Due to a Certified Dan Moment, you must duplicate the
@@ -145,7 +139,6 @@ The reason for this is that otherwise, the crouch just glitches out at the end
 of the standing-up animation. Dan Moment
 
 */
-
 
 
 // Hurtbox sprites
@@ -170,6 +163,7 @@ air_dodge_sound     = asset_get("sfx_quick_dodge");
 bubble_x = 0;
 bubble_y = 8;
 
+
 //
 //  Ability init
 //
@@ -187,23 +181,32 @@ ult_instance = noone;
 
 // Barrier
 barrier_timer = 0;
-barrier_rate = 240; //default lifetime
+barrier_rate = 240;     // Default lifetime
 barrier_placing = false;
 
 // Weapon
 max_ammo = 600;
 ammo = max_ammo;
 weapon_aim = 0;
-aim_accel = 0.25;    // The higher it is, the faster the acceleration
-aim_decel = 0.5;    // The higher it is, the smoother the deceleration
+aim_accel = 0.4;       // The higher it is, the faster the acceleration
+aim_decel = 0.5;        // The higher it is, the smoother the deceleration
 aim_speed = 1;
 angle_allowance = 2;
 max_aim_speed = 10;
 
 // Beam
 beam_target = noone;
-beam_list = [];     //List of eligble targets for beam
-beam_chip = 0;        //Increments until hitting a damage threshold
+beam_list = [];         // List of eligble targets for beam.
+beam_chip = 0;          // Increments until hitting a damage threshold
+beam_chip_1 = 10;       // Amount of ticks required to deal damage at level 1.
+beam_chip_2 = 6;        // Amount of ticks required to deal damage at level 2.
+beam_chip_3 = 1;        // Amount of ticks required to deal damage at level 3.
+beam_chip_threshold = beam_chip_1;
+beam_charge = 0;        // Current beam charge.
+beam_charge_decay = 1;
+beam_charge_2 = 60;                     // Charge cost for level 2 / how many frames until charge 2
+beam_charge_3 = beam_charge_2 + 120;    // Charge cost for level 3 / how many frames until charge 3
+beam_charge_max = beam_charge_3 + 30;   // Maximum charge points held
 beam_length = 0;
 beam_timer = 0;
 beam_x = 0;
@@ -214,23 +217,13 @@ weapon_x = 0;
 weapon_y = 0;
 arm_offset_x = 8;
 arm_offset_y = 33;
-beam_offset = 40;//24
+beam_offset = 40;   //24
 o_dist = 0;
 o_angle = 0;    
-charge = 0;     //current beam charge
 beam_range = has_rune_beam_lock_on ? 32*4 : 32*12;
 beam_preview_range = beam_range;
 beam_max_range = beam_range+32;
 beam_lock_time = 60;
-charge_decay = 1;
-charge_2 = 60;                      // Charge cost for level 2 / how many frames until charge 2
-charge_3 = charge_2 + 120;           // Charge cost for level 3 / how many frames until charge 3
-charge_max = charge_3 + 30;        // Maximum charge points held
-beam_chip_1 = 10;      // How many ticks does it take to deal damage
-beam_chip_2 = 6;      // How many ticks does it take to deal damage
-beam_chip_3 = 1;      // How many ticks does it take to deal damage
-beam_chip_threshold = beam_chip_1;
-
 
 // Orbs
 orb_cost = 100;
@@ -253,7 +246,7 @@ dspecial_hud_sprite_active = has_rune_turret_heal ? "ability_sentryturret_healin
 dspecial_hud_sprite_cooldown = has_rune_turret_heal ? "ability_sentryturret_healing_cooldown" : "ability_sentryturret_cooldown";
 
 // Team     -   Used for beam and turret targetting
-player_count = 0
+// player_count = 0
 // all_players = [];
 // other_players = [];
 // for (i = 0; i < 4; i++) {
@@ -300,7 +293,6 @@ player_count = 0
 //     }
 // }
 
-
 orig_dash_speed = dash_speed;
 
 // Teleporter
@@ -309,7 +301,7 @@ tp_x = x;
 tp_xv = 0;
 tp_y = y;
 tp_yv = 0;
-tp_timer = 0;
+tp_timer = 0;   // Teleporter cooldown timer.
 tp_rate = 480;
 tp_tp_timer = 0;
 tp_interval = 30;
@@ -318,7 +310,6 @@ tp_subject = noone;
 tp_slide_step = 0;
 tp_slide = 0;
 tp_slide_length = 120;
-
 
 // Effects
 cfx_beam_fire = hit_fx_create(sprite_get("cfx_beam_fire"), 8);
@@ -335,17 +326,16 @@ sym_r0 = get_color_profile_slot_r(get_player_color(player),0);
 sym_g0 = get_color_profile_slot_g(get_player_color(player),0);
 sym_b0 = get_color_profile_slot_b(get_player_color(player),0);
 
-
 // Kirby Support
 kirbyability = 16;
 newicon = 0;
 swallowed = 0;
 enemykirby = noone;
 
-
-
 // Muno template: (don't change)
 
-//user_event(14); // General init
-#define is_fighting()
-is_fighting() {return state != PS_DEAD  && state != PS_SPAWN && state != PS_RESPAWN;}
+turret_targets = [];
+
+
+
+user_event(14); // General init

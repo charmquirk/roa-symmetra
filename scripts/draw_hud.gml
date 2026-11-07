@@ -59,7 +59,7 @@ if has_rune_more_turrets {
 
 // Teleporter
 var uspecial_sprite_name = "ability_teleporter";
-if (attack == AT_USPECIAL && special_down) || instance_exists(teleporter_entrance) || instance_exists(teleporter_exit) {
+if attack == AT_USPECIAL && special_down {
     uspecial_sprite_name = "ability_teleporter_active";
 }
 else if tp_timer > 0 {
@@ -74,17 +74,17 @@ if tp_timer > 0 {   draw_debug_text(temp_x + 93, temp_y - 28, string(time_left))
 if attack == AT_JAB && ammo > 0 {
     // draw_sprite_ext(sprite_get("beam_charges_bar"), -1, temp_x+30, temp_y+40, 1, (-10 + -(clamp(charge, charge, charge_3))/(charge_3/22)), 0, sym_color2, 1);        //(-clamp(charge, 0, charge_3))/(charge_3/32)
     
-    var bar_2_length = clamp(charge, 0, charge_2)/(charge_2/11)
-    var bar_3_length = clamp(charge, 0, charge_3)/(charge_3/11)
+    var bar_2_length = clamp(beam_charge, 0, beam_charge_2)/(beam_charge_2/11)
+    var bar_3_length = clamp(beam_charge, 0, beam_charge_3)/(beam_charge_3/11)
     draw_sprite_ext(sprite_get("beam_charges_bar"), -1, temp_x+30, temp_y+40, 1, (-10 + -(bar_2_length) -(bar_3_length)), 0, sym_color1, 1);        //(-clamp(charge, 0, charge_3))/(charge_3/32)
     
     if attack_down {
         var beam_hud_height = 0;
         
-        if charge < charge_2 {      // Level 1
+        if beam_charge < beam_charge_2 {      // Level 1
             beam_hud_height = 30;
         }
-        else if charge < charge_3 { // Level 2
+        else if beam_charge < beam_charge_3 { // Level 2
             beam_hud_height = 20
         }
         else {                      // Level 3

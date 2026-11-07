@@ -2,7 +2,7 @@
 
 
 // Long dodge
-if has_rune_long_dodge && (state == PS_AIR_DODGE || state == PS_WAVELAND) {draw_indicator = false;}
+if has_rune_long_dodge && (state == PS_AIR_DODGE || state == PS_WAVELAND) {	draw_indicator = false;	}
 //invisible = true; init_shader();
 // else {  outline_color = [0,0,0];}outline_color = [sym_r0,sym_g0,sym_b0];
 
@@ -41,20 +41,21 @@ if (turret_charges < turret_charges_max) {
 }
 
 
+// JAB Beam charge
+if beam_charge > 0 {
+    if attack != AT_JAB	// If not attacking with beam...
+    || attack == AT_JAB && !attack_down // If not firing beam..
+    || attack == AT_JAB && beam_target == noone	// If there is no beam target...
+    {
+    	beam_target = noone;	// Deselect target if there is one.
+        beam_charge -= beam_charge_decay;	// Decrease beam charge.
+        beam_timer = 0;		// Reset beam charge up timer.
     }
 }
 
-
-// Not using beam or you haven't been targeting anyone
-if (attack != AT_JAB || attack == AT_JAB && !attack_down || beam_target == noone && window_timer > 2 ) {
-    //get_window_value(AT_JAB, 2, AG_WINDOW_LENGTH)
-    beam_target = noone;
-    // beam_length = 0;
-    beam_timer = 0;
-}
-
+// JAB Beam timer
 if beam_timer > 0 && beam_length > beam_range {
-    beam_timer--;
+    beam_timer--;	// Decrease beam timer.
 }
 
 if ("beam_lock_time" in self) { clamp(beam_timer, 0, beam_lock_time);}

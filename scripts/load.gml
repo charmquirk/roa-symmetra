@@ -65,9 +65,12 @@ sprite_change_offset("portal", 31, 76);
 sprite_change_offset("teleporter_mask", 31, 76);
 sprite_change_offset("teleporter_preview", 31, 76);
 
-// Spawn Point Ultimate
+// Ultimates
 sprite_change_offset("hologram", 63, 140);
 sprite_change_offset("spawn_point_preview", 31, 76);
+sprite_change_offset("shield_generator_preview", 31, 76);
+sprite_change_offset("shield_generator", 33, 76);
+sprite_change_offset("shield_area", 205, 205);
 
 // Beam
 sprite_change_offset("beam_tip", 31, 31);

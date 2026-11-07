@@ -12,9 +12,9 @@ if !(state == PS_HITSTUN || state == PS_HITSTUN_LAND || state == PS_TUMBLE || st
     if attack == AT_JAB && attack_down && ammo > 0 {
         if !collision_point(beam_x, beam_y, self, false, false) { //If colliding with beam maker, don't draw the beam
             var beam_sprite = "";
-            if charge < charge_2        { beam_sprite = "beam_w1";   }        // LEVEL 1
-            else if charge < charge_3   { beam_sprite = "beam_w2";   }        // LEVEL 2
-            else if charge >= charge_3  { beam_sprite = "beam_w4";   }        // LEVEL 3
+            if beam_charge < beam_charge_2        { beam_sprite = "beam_w1";   }        // LEVEL 1
+            else if beam_charge < beam_charge_3   { beam_sprite = "beam_w2";   }        // LEVEL 2
+            else if beam_charge >= beam_charge_3  { beam_sprite = "beam_w4";   }        // LEVEL 3
         }
         draw_sprite_ext(sprite_get(beam_sprite), -1, weapon_x, weapon_y, abs(beam_length)/2, 1, weapon_aim, c_white, 1);
     }

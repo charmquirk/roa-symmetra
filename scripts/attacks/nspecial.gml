@@ -22,8 +22,8 @@ set_window_value(AT_NSPECIAL, 2, AG_WINDOW_SFX_FRAME, 4);
 // set_window_value(AT_NSPECIAL, 2, AG_WINDOW_SFX, sound_get("orb charging 1"));
 
 // Holding
-set_window_value(AT_NSPECIAL, 3, AG_WINDOW_TYPE, 9); // looping window
-set_window_value(AT_NSPECIAL, 3, AG_WINDOW_LENGTH, 8);
+set_window_value(AT_NSPECIAL, 3, AG_WINDOW_TYPE, 4); // looping window
+set_window_value(AT_NSPECIAL, 3, AG_WINDOW_LENGTH, 4);
 set_window_value(AT_NSPECIAL, 3, AG_WINDOW_ANIM_FRAMES, 4);
 set_window_value(AT_NSPECIAL, 3, AG_WINDOW_ANIM_FRAME_START, 16);
 set_window_value(AT_NSPECIAL, 3, AG_WINDOW_HAS_SFX, 1);

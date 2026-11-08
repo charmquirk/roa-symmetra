@@ -32,7 +32,7 @@ if turret_timer > 0 { //Cooldown
     dspecial_hud_sprite = dspecial_hud_sprite_cooldown;
 }
 else {
-    if (special_down && attack == AT_DSPECIAL && window == 2 && !has_rune("E")) || (has_rune("E") && instance_exists(sentry)) { //active
+    if (special_down && attack == AT_DSPECIAL && window == 2 && !has_rune_more_turrets) || (has_rune_more_turrets && instance_exists(turrets[0])) { //active
         dspecial_hud_sprite = dspecial_hud_sprite_active;
        }
     else { //inactive

@@ -189,8 +189,10 @@ joystick_aiming = false;
 max_ammo = 600;
 ammo = max_ammo;
 weapon_aim = 0;
-aim_accel = 0.5;       // The higher it is, the faster the acceleration
-aim_decel = 0.2;        // The higher it is, the smoother the deceleration
+aim_cos = 0;            // The y-value
+aim_sin = 0;            // The y-value
+aim_accel = 0.5;        // The higher it is, the faster the acceleration.
+aim_decel = 0.2;        // The higher it is, the smoother the deceleration.
 aim_speed = 1;
 angle_allowance = 2;
 max_aim_speed = 10;
@@ -228,10 +230,14 @@ beam_lock_time = 60;
 
 // Orbs
 orb_cost = 100;
-miniorb_cost = 50;
 orb_speed = 6;
-orb_hsp = 0;
-orb_vsp = 0;
+orb_cost = 100;
+mini_orb_speed = has_rune_orb_scaling ? orb_speed * 2 : orb_speed;
+mini_orb_damage = 2;
+mini_orb_cost = orb_cost / 2;
+big_orb_speed = has_rune_orb_scaling ? orb_speed / 4 : orb_speed;
+big_orb_damage = has_rune_orb_aiming ? 6 : 4;
+big_orb_cost = orb_cost;
 
 // Sentry Turrets
 turret_charges_max = has_rune_more_turrets ? 3 : 1;

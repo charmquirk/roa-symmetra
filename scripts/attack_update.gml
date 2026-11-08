@@ -1,4 +1,4 @@
-// attack_update
+// attack_update		runs while attacking.
 
 
 
@@ -348,7 +348,64 @@ switch(attack) {
 	   //     }
 	   //     break;
 	   // }
-
+	case AT_DSPECIAL :	// Turrets
+    	var new_turret = noone; // Null instance id.
+        switch(window) {
+        	case 1 :
+        		if window_timer == 1 { // Only execute on first frame.
+        			if has_rune_more_turrets {
+        				turrets = deployable_destroy(turrets, turrets[0]); // Destroy oldest turret, if possible.
+        			}
+        			else {
+    					turrets = deployable_destroy_all(turrets);
+        			}
+        		}
+        		break;
+        	
+            case 2 : // Preview
+            	if window_timer == 1 { // Only execute on first frame.
+            		// Cancel if you can't create turrets.
+            		if turret_charges <= 0 {	move_cooldown[AT_DSPECIAL] = 4; }
+            	}
+            	if !special_down && state_timer > 20 {	// If special button released...
+            		window = 3;	// Switch to next attack window.
+            		window_timer = 0;
+                }
+                break;
+            
+            case 3 : // Deploy
+            	if window_timer == 1 && turret_charges > 0 && turret_timer <= 0 { // Only execute on first frame
+            		if !instance_exists(new_turret) {
+            			// Place grounded turrets on the ground,
+            			// Place aerial turrets at the midline of the character.
+            			var turret_y_offset = free ? y-char_height/2 : y-18;
+	            		new_turret = deployable_create(turrets, "obj_article3", x, turret_y_offset);
+            		}
+            		if instance_exists(new_turret) {
+						new_turret.can_be_grounded = !free;
+	            		new_turret.is_healing = has_rune_turret_heal;
+	            		new_turret.is_weak_turret = has_rune_more_turrets;
+	            		new_turret.aim_range = new_turret.is_weak_turret ? 32*5 : 32*8;
+	            		new_turret.health_max = new_turret.is_weak_turret ? 16 : 64;
+	            		new_turret.lifetime = new_turret.is_weak_turret ? turret_rate*2 : turret_rate;
+	            		new_turret.chip_damage = new_turret.is_healing ? -1 : 1;
+	            		switch new_turret.is_weak_turret {
+							case true:
+								new_turret.chip_threshold = new_turret.is_healing ? 40 : 20;
+								break;
+							case false:
+								new_turret.chip_threshold = new_turret.is_healing ? 20 : 10;
+								break;
+						}
+	        			turret_charges--;
+	                	move_cooldown[AT_DSPECIAL] = 4; //Cooldown before placing next turret
+	                	turret_timer += turret_rate;
+            		}
+            		else {	print_debug("ERROR: Failed to create sentry turret!");	}
+			    }
+                break;
+		}
+		break;
         
     case AT_FSPECIAL :	// Barrier
     	switch(window) {
@@ -399,146 +456,113 @@ switch(attack) {
     	}
     	break;
 
-    case AT_NSPECIAL :
-    	
-    	if special_down {
-    		// switch(spr_dir) {	// Weapon can't be aimed past your head or behind you
-      //      	case -1:
-      //      		weapon_aim = clamp(weapon_aim, 90, 270);
-      //      		break;
-      //      	case 1:
-      //      		if weapon_aim > 90 && weapon_aim < 180 {	weapon_aim = 90;	}
-      //      		if weapon_aim > 180 && weapon_aim < 270 {	weapon_aim = 270;	}
-      //              break;
-      //      }
-    		
-    		
-    		
-    		//Reset weapon aim when flipping directions
-    		// if left_down && !right_down && spr_dir == 1 { spr_dir =-1; weapon_aim = (90*(1-spr_dir));} //Flip direction and reset weapon aim
-      //      if right_down && !left_down && spr_dir == -1 { spr_dir = 1; weapon_aim = (90*(1-spr_dir));}
-			// weapon_aim = (spr_dir == 1 && left_down && !right_down) ? (90*(1-spr_dir)) : weapon_aim; // If facing right
+	case AT_NSPECIAL :
+		var orb_type = 1;
 		
-            var v_dir = up_down - down_down;
-    		if window != 4 { aim_speed += aim_accel*spr_dir*v_dir; }			// Aiming Mode disabled during release window
-            else { if aim_speed > 0 || aim_speed < 0 { aim_speed = aim_speed*aim_decel; }}	// Decelerate if you aren't aiming
-            
-        	weapon_x = x - spr_dir*arm_offset_x + round((beam_offset)*dcos(weapon_aim)); //Set weapon x location for where the orb will fire from
-			weapon_y = y - arm_offset_y - round((beam_offset)*dsin(weapon_aim)); //Set weapon y location for where the orb will fire from
-            aim_speed = clamp(aim_speed, -max_aim_speed, max_aim_speed);	// Aim speed doesn't go past max speed
-            weapon_aim += aim_speed;	// Weapon aim is modified by aim speed/acceleration
-            weapon_aim = (up_down || down_down) ? weapon_aim : round(weapon_aim); //Aiming is accurate, not aiming rounds to nearest degree
-            weapon_aim = (weapon_aim >= 360) ? 0 : weapon_aim;	// Resets aim if you go past 360, otherwise the same
-            weapon_aim = (weapon_aim < 0) ? 360 : weapon_aim;	// Resets aim if you go below 0, otherwise the same
-            weapon_aim = clamp(weapon_aim, 0, 360);		// Closes degree range
-            switch(spr_dir) {	// Weapon can't be aimed past your head or behind you
-            	case -1:
-            		weapon_aim = clamp(weapon_aim, 90, 270);
-            		break;
-            	case 1:
-            		if weapon_aim > 90 && weapon_aim < 180 {	weapon_aim = 90;	}
-            		if weapon_aim > 180 && weapon_aim < 270 {	weapon_aim = 270;	}
-                    break;
-            }
-            orb_h = orb_speed*dcos(weapon_aim);
-            orb_v = orb_speed*dsin(weapon_aim);
-    	}
-    	else {
-    		if aim_speed = 0 { weapon_aim = (90*(1-spr_dir)); }//if not firing orbs, set weapon aim to the sprite direction
-    	}
+		if special_down {
+			if has_rune_orb_aiming {
+				// Set aim speed.
+				var v_dir = up_down - down_down;
+				if window != 4	{ aim_speed += aim_accel * spr_dir * v_dir; }	// Aiming disabled during release window to improve accuracy.
+				if aim_speed != 0 && v_dir == 0 { aim_speed *= aim_decel; }		// Decelerate if not aiming.
+				aim_speed = clamp(aim_speed, -max_aim_speed, max_aim_speed);	// Aim speed doesn't go past max speed
+				
+				// Set weapon aim angle.
+				weapon_aim += aim_speed;	// Weapon aim is modified by aim speed/acceleration
+				weapon_aim = (weapon_aim >= 360) ? 0 : weapon_aim;	// Resets aim if you go past 360, otherwise the same
+				weapon_aim = (weapon_aim < 0) ? 360 : weapon_aim;	// Resets aim if you go below 0, otherwise the same
+				weapon_aim = clamp(weapon_aim, 0, 360);		// Closes degree range
+				
+				// Limit angle to prevent going behind you.
+				switch(spr_dir) {
+					case -1:
+						weapon_aim = clamp(weapon_aim, 90, 270);
+						break;
+					case 1:
+						if weapon_aim > 90 && weapon_aim < 180 {	weapon_aim = 90;	}
+						if weapon_aim > 180 && weapon_aim < 270 {	weapon_aim = 270;	}
+						break;
+				}
+				
+				// Set orb speed.
+				var rounded_weapon_aim = round(weapon_aim);
+				aim_cos = dcos(rounded_weapon_aim);
+				aim_sin =  dsin(rounded_weapon_aim);
+			}
+            // Set the starting position of the orb.
+        	weapon_x = x - spr_dir * arm_offset_x + beam_offset * dcos(weapon_aim);	
+			weapon_y = y - arm_offset_y - beam_offset * dsin(weapon_aim);
+		}
+		else {
+			aim_speed = 0;
+		}
+		
         switch(window) {
-        	case 1: //start
-        		if state == PS_ATTACK_GROUND || state == PS_ATTACK_AIR {		//start of the move. dont use window == 1
-        			aim_speed = 0; //Reset aim speed
-        			weapon_aim = 90*(1-spr_dir); //Reset aim to directly in front of you
-        			if (ammo <= 0) {	set_attack(AT_EXTRA_1);	}		//Reload if no ammo
-        			reset_hitbox_value(AT_NSPECIAL, 1, HG_WINDOW_CREATION_FRAME);
-                	reset_hitbox_value(AT_NSPECIAL, 2, HG_WINDOW_CREATION_FRAME);
-                	
-                	set_hitbox_value(AT_NSPECIAL, 2, HG_WINDOW_CREATION_FRAME, 99); //Delay creation of charged orb
-                	
-        			switch(spr_dir) {	// Weapon can't be aimed past your head or behind you
-                    	case -1:
-                    		if weapon_aim < 90 && weapon_aim >= 0 { weapon_aim = abs(180 - weapon_aim); }
-                    		if weapon_aim > 270 && weapon_aim <= 360 { weapon_aim = 180 + abs(360 - weapon_aim);	}
-                    		break;
-                    	case 1:
-                    		if weapon_aim > 90 && weapon_aim <= 180 {	weapon_aim = abs(180 - weapon_aim);	}
-                    		if weapon_aim < 270 && weapon_aim > 180 {	weapon_aim = 180 + abs(360 - weapon_aim);	}
-                    		
-                    		
-                    		break;
-                    }
-        			// weapon_aim = 180*floor(weapon_aim/180)	+ abs((180*floor(weapon_aim/180) + 180) - weapon_aim);		// Sets weapon aim to similar angle when switching sides
-        		}
+			case 1:
+				// Reset variables.
+				aim_speed = 0;
+				weapon_aim = 90 * (1-spr_dir); // Reset aim to directly in front of you. 0 or 270.
+				aim_cos = spr_dir;
+				aim_sin = 0;
+				break;
+			case 2:
+				// Reload if thee's no ammo.
+				if (ammo <= 0) {	set_attack(AT_EXTRA_1);	}		
                 break;
-            case 2: //charge
-            	if (special_down) {
-            		// Charged
-            		reset_hitbox_value(AT_NSPECIAL, 2, HG_WINDOW_CREATION_FRAME);
-            		set_hitbox_value(AT_NSPECIAL, 1, HG_WINDOW_CREATION_FRAME, 99);
-            		
-            		
-            		// orb_h = round(orb_h);
-            		// orb_v = round(orb_v);
-            		
-            		
-            	}
-            	else if state_timer > 8 {
-            		window = 4;
-            		window_timer = 0;
-            	}
-            	
-                // if left_pressed { spr_dir = -1; weapon_aim = 180;}
-                // if right_pressed { spr_dir = 1; weapon_aim = 0;}
+            case 3:
+				// Cancel charging
+				if !special_down || state_timer > 16 {
+					// Re-disable orbs.
+					reset_hitbox_value(AT_NSPECIAL, 1, HG_WINDOW_CREATION_FRAME);
+					reset_hitbox_value(AT_NSPECIAL, 2, HG_WINDOW_CREATION_FRAME);
+					
+					// Reset their speed.
+					set_hitbox_value(AT_NSPECIAL, 1, HG_PROJECTILE_HSPEED, mini_orb_speed);
+					set_hitbox_value(AT_NSPECIAL, 1, HG_PROJECTILE_VSPEED, 0);
+					set_hitbox_value(AT_NSPECIAL, 2, HG_PROJECTILE_HSPEED, big_orb_speed);
+					set_hitbox_value(AT_NSPECIAL, 2, HG_PROJECTILE_VSPEED, 0);
+					
+					// Enable correct orb.
+					if state_timer >= 16 {	orb_type = 2;	} 
+					set_hitbox_value(AT_NSPECIAL, orb_type, HG_WINDOW_CREATION_FRAME, 0);
+					
+					// Set the orb speed according to weapon aim angle.
+					var new_speed = orb_type == 1 ? mini_orb_speed : big_orb_speed;
+					var new_hsp = new_speed * aim_cos * spr_dir;
+					set_hitbox_value(AT_NSPECIAL, orb_type, HG_PROJECTILE_HSPEED, new_hsp);
+					var new_vsp = -new_speed * aim_sin;
+					set_hitbox_value(AT_NSPECIAL, orb_type, HG_PROJECTILE_VSPEED, new_vsp);
+					
+					// Set the starting position of the orb.
+					var starting_position_x = spr_dir * beam_offset * aim_cos - arm_offset_x;
+					set_hitbox_value(AT_NSPECIAL, orb_type, HG_HITBOX_X, starting_position_x);
+					var starting_position_y = -beam_offset * aim_sin - arm_offset_y;
+					set_hitbox_value(AT_NSPECIAL, orb_type, HG_HITBOX_Y, starting_position_y);
+					
+					// Release orb.
+					window = 4;
+					window_timer = 0;
+					
+					// Consume ammo if possible.
+					var new_cost = orb_type == 1 ? mini_orb_cost : big_orb_cost;
+					if ammo < new_cost {
+						set_attack(AT_EXTRA_1);	// Reload.
+					}
+					else {
+						ammo -= new_cost;	// Subtract required ammo.
+					}
+				}
                 break;
-            case 3: // hold
-            	sound_stop(sound_get("orb charging 1"));
-            	// aim_speed = 0;
-            	if state_timer > 60 { //If held orb to max
-            			window = 4;
-            			window_timer = 0;
-            	}
-            	if (!special_down) {window = 4;	window_timer = 0;}
-            	
-            	
-            	break;
             case 4:
-            	
-            	//The angle the orb fires at
-            	set_hitbox_value(AT_NSPECIAL, 2, HG_PROJECTILE_HSPEED, spr_dir*orb_h);
-            	set_hitbox_value(AT_NSPECIAL, 2, HG_PROJECTILE_VSPEED, -orb_v);
-            	
-            	//Where the orb fires from
-            	set_hitbox_value(AT_NSPECIAL, 2, HG_HITBOX_X, spr_dir*beam_offset*dcos(weapon_aim) - arm_offset_x);
-            	set_hitbox_value(AT_NSPECIAL, 2, HG_HITBOX_Y, -beam_offset*dsin(weapon_aim) - arm_offset_y);
-            	if (window_timer == 1) {
-            		if get_hitbox_value(AT_NSPECIAL, 2, HG_WINDOW_CREATION_FRAME) == 99 {	//Mini Orb
-            			if ammo < miniorb_cost {
-            				set_attack(AT_EXTRA_1);
-            			}
-            			else {
-            				ammo -= miniorb_cost;
-            			}
-            		}
-            		else {	// Big Orb
-            			if ammo < orb_cost {
-            				set_attack(AT_EXTRA_1);
-            			}
-            			else {
-            				ammo -= orb_cost;
-            			}
-            		}
-            	}
-            	if window_timer == (get_window_value(AT_NSPECIAL, 4, AG_WINDOW_LENGTH) - 1) && special_down { //If window expired but still firing
-            		window = 2; //restart charging phase for next orb
-            		window_timer = 0;
-            		state_timer = 0;
-            	}
-            	else { //If you stop firing and this is your last orb
-            		// weapon_aim = 90*(1-spr_dir); //reset aim to directly in front of you
-            	}
-            	break;
+				// sound_stop(sound_get("orb charging 1"));
+				
+				var last_frame = get_window_value(AT_NSPECIAL, 4, AG_WINDOW_LENGTH) - 1;
+				if window_timer == last_frame && special_down {
+					window = 2; // Restart charging phase for next orb.
+					window_timer = 0;
+					state_timer = 0;
+				}
+				break;
         }
         break;
         
@@ -669,28 +693,41 @@ switch(attack) {
 }
 
 
-//Movement
-if (attack == AT_NSPECIAL || attack == AT_JAB || attack == AT_DSPECIAL || attack == AT_EXTRA_2)  { //&& window == 2
+// Movement while attacking
+if (attack == AT_NSPECIAL && !has_rune_orb_aiming)	// If firing orbs without the ability to aim...
+|| (attack == AT_JAB && has_rune_beam_lock_on )		// If firing lock-on beam...
+|| attack == AT_EXTRA_2		// If placing ultimate...
+{
+	draw_indicator = false;		// Hide indicator while aiming.
 	
-	draw_indicator = false;		// Hide indicator while aiming
-	
-    // Single Jump
+    // Allow single jump.
     if jump_pressed && !free {
     	clear_button_buffer(PC_JUMP_PRESSED);
 		vsp = -jump_speed;
 		sound_play(asset_get("sfx_jumpground"));
     }
 	
-	// Walking or Falling
-    if (right_down || left_down) {
-    	//Change direction
-		if attack == AT_EXTRA_2 {spr_dir = (1 +(-2*left_down)); }
-    	hsp += (!free) ? ((1+walk_accel)* (1 +(-2*left_down))) : ((air_accel)*(1 +(-2*left_down)));
-    	hsp = (!free) ? (clamp(hsp, -walk_speed, walk_speed)) : (clamp(hsp, -air_max_speed, air_max_speed));
-    } else {
-    	hsp = (!free) ? (hsp*air_friction) : (hsp*ground_friction);
+	// Allow walking.
+    if right_down || left_down {
+    	// Set movement direction.
+    	var h_dir = right_down - left_down;
+    	
+    	// Change direction during ultimate.
+		if attack == AT_EXTRA_2 {	spr_dir = h_dir; }
+	
+		// Set acceleration.
+		var new_accel = free ? air_accel : walk_accel;
+    	hsp += (1 + new_accel) * h_dir;
+    	
+    	// Set max horizontal speed.
+    	var new_max_hsp = free ? air_max_speed : walk_speed;
+    	hsp = clamp(hsp, -new_max_hsp, new_max_hsp);
+    } 
+    else {
+    	// Set friction.
+    	var new_friction = free ? air_friction : ground_friction;
+    	hsp *= new_friction;
     }
-    
     // Cannot double jump or dash/sprint while aiming. //
 }
 

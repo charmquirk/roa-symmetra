@@ -107,7 +107,7 @@ mask_index = sprite_get("teleporter_mask")
 var new_sprite = "";
 switch (state) {
 	case -1:
-		new_sprite = type == "ultimate" ? "spawn_point_preview" : "shield_generator_preview";
+		new_sprite = type == "ultimate" ? "spawn_point_preview" : "teleporter_preview";
 		if image_alpha <= 1 {
 			image_alpha = state_timer * deploy_speed;
 		}
@@ -123,7 +123,7 @@ switch (state) {
         new_sprite = "deployable";
         break;
 	case 2:
-		new_sprite = type == "ultimate" ? "spawn_point_preview" : "shield_generator_preview";
+		new_sprite = type == "ultimate" ? "spawn_point_preview" : "teleporter_preview";
 		if image_alpha > 0 {
 			image_alpha -= deploy_speed;
 		}

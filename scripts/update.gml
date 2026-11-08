@@ -1,4 +1,4 @@
-//update.gml
+//update.gml		runs all the time.
 
 
 // Long dodge
@@ -53,10 +53,12 @@ if beam_charge > 0 {
     }
 }
 
+
 // JAB Beam timer
 if beam_timer > 0 && beam_length > beam_range {
     beam_timer--;	// Decrease beam timer.
 }
+
 
 if ("beam_lock_time" in self) { clamp(beam_timer, 0, beam_lock_time);}
 
@@ -104,17 +106,8 @@ if attack == AT_USPECIAL {
 		tp_exit.x = clamp(tp_exit.x, x - tp_range_x, x + tp_range_x);
 		var tp_range_y = 96;
 		tp_exit.y = clamp(tp_exit.y, y - tp_range_y, y + tp_range_y);
-		
-		// Allow jumping.
-		// if jump_pressed && !free {
-		// 	clear_button_buffer(PC_JUMP_PRESSED);
-		// 	vsp = -jump_speed;
-		// 	sound_play(asset_get("sfx_jumpground"));
-		// }
 	}
 }
-
-
 
 
 // Teleporting
@@ -153,10 +146,6 @@ if instance_exists(teleporters[0]) && instance_exists(teleporters[1]) {
 }
 
 
-
-
-
-
 // Cancel preview attacks
 if (state == PS_HITSTUN || state == PS_HITSTUN_LAND || state == PS_TUMBLE || state == PS_PRATFALL || state == PS_PRATLAND || state == PS_FROZEN || state == PS_WRAPPED || state == PS_DEAD) {
     // if instance_exists(teleporter_entrance) && teleporter_entrance.state = -1 { instance_destroy(teleporter_entrance); }
@@ -164,8 +153,6 @@ if (state == PS_HITSTUN || state == PS_HITSTUN_LAND || state == PS_TUMBLE || sta
 
     sound_stop(sound_get("orb charging 1"));
 }
-
-
 
 
 // Spawn Point ultimate
@@ -197,6 +184,8 @@ if instance_exists(ult_instance) {
     // Clear the array
     dead_teammates = [];
 }
+
+
 // Clear empty spaces and reoganize array
 if array_length(dead_teammates) > 0 {
 	var new_teammate_array = [];

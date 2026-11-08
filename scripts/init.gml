@@ -13,7 +13,7 @@ has_rune_remote_place   = has_rune("A");
 has_rune_more_turrets   = has_rune("B");
 has_rune_turret_proj    = has_rune("C");
 has_rune_beam_lock_on   = has_rune("D");
-has_rune_beam_lifesteal = has_rune("E");
+has_rune_orb_aiming     = has_rune("E");
 has_rune_shield_health  = has_rune("F");
 has_rune_tp_exit        = has_rune("G");
 has_rune_tp_airborne    = has_rune("H");
@@ -185,11 +185,12 @@ barrier_rate = 240;     // Default lifetime
 barrier_placing = false;
 
 // Weapon
+joystick_aiming = false;
 max_ammo = 600;
 ammo = max_ammo;
 weapon_aim = 0;
-aim_accel = 0.4;       // The higher it is, the faster the acceleration
-aim_decel = 0.5;        // The higher it is, the smoother the deceleration
+aim_accel = 0.5;       // The higher it is, the faster the acceleration
+aim_decel = 0.2;        // The higher it is, the smoother the deceleration
 aim_speed = 1;
 angle_allowance = 2;
 max_aim_speed = 10;
@@ -227,10 +228,10 @@ beam_lock_time = 60;
 
 // Orbs
 orb_cost = 100;
-miniorb_cost = 25;
+miniorb_cost = 50;
 orb_speed = 6;
-orb_h = 0;
-orb_v = 0;
+orb_hsp = 0;
+orb_vsp = 0;
 
 // Sentry Turrets
 turret_charges_max = has_rune_more_turrets ? 3 : 1;

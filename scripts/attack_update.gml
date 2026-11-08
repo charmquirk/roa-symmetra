@@ -565,11 +565,7 @@ switch(attack) {
 				break;
         }
         break;
-        
-    // case AT_NAIR:
-    // 	set_attack(AT_JAB);		// Use beam in the air.
-    // 	break;
-        
+    
     case AT_USPECIAL:
     	var tp_entrance = noone;
     	var tp_exit = noone;
@@ -631,65 +627,6 @@ switch(attack) {
         		break;
         }
         break;
-    
-    case AT_DSPECIAL :	// Turrets
-    	var new_turret = noone; // Null instance id.
-        switch(window) {
-        	case 1 :
-        		if window_timer == 1 { // Only execute on first frame.
-        			if has_rune_more_turrets {
-        				turrets = deployable_destroy(turrets, turrets[0]); // Destroy oldest turret, if possible.
-        			}
-        			else {
-    					turrets = deployable_destroy_all(turrets);
-        			}
-        		}
-        		break;
-        	
-            case 2 : // Preview
-            	if window_timer == 1 { // Only execute on first frame.
-            		// Cancel if you can't create turrets.
-            		if turret_charges <= 0 {	move_cooldown[AT_DSPECIAL] = 4; }
-            	}
-            	if !special_down && state_timer > 20 {	// If special button released...
-            		window = 3;	// Switch to next attack window.
-            		window_timer = 0;
-                }
-                break;
-            
-            case 3 : // Deploy
-            	if window_timer == 1 && turret_charges > 0 && turret_timer <= 0 { // Only execute on first frame
-            		if !instance_exists(new_turret) {
-            			// Place grounded turrets on the ground,
-            			// Place aerial turrets at the midline of the character.
-            			var turret_y_offset = free ? y-char_height/2 : y-18;
-	            		new_turret = deployable_create(turrets, "obj_article3", x, turret_y_offset);
-            		}
-            		if instance_exists(new_turret) {
-						new_turret.can_be_grounded = !free;
-	            		new_turret.is_healing = has_rune_turret_heal;
-	            		new_turret.is_weak_turret = has_rune_more_turrets;
-	            		new_turret.aim_range = new_turret.is_weak_turret ? 32*5 : 32*8;
-	            		new_turret.health_max = new_turret.is_weak_turret ? 16 : 64;
-	            		new_turret.lifetime = new_turret.is_weak_turret ? turret_rate*2 : turret_rate;
-	            		new_turret.chip_damage = new_turret.is_healing ? -1 : 1;
-	            		switch new_turret.is_weak_turret {
-							case true:
-								new_turret.chip_threshold = new_turret.is_healing ? 40 : 20;
-								break;
-							case false:
-								new_turret.chip_threshold = new_turret.is_healing ? 20 : 10;
-								break;
-						}
-	        			turret_charges--;
-	                	move_cooldown[AT_DSPECIAL] = 4; //Cooldown before placing next turret
-	                	turret_timer += turret_rate;
-            		}
-            		else {	print_debug("ERROR: Failed to create sentry turret!");	}
-			    }
-                break;
-		}
-		break;
 }
 
 

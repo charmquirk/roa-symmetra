@@ -359,14 +359,13 @@ switch(attack) {
         			else {
     					turrets = deployable_destroy_all(turrets);
         			}
+        			if turret_charges <= 0 {
+        				move_cooldown[AT_DSPECIAL] = 4;	// Cancel if you can't create turrets.
+        			}
         		}
         		break;
         	
             case 2 : // Preview
-            	if window_timer == 1 { // Only execute on first frame.
-            		// Cancel if you can't create turrets.
-            		if turret_charges <= 0 {	move_cooldown[AT_DSPECIAL] = 4; }
-            	}
             	if !special_down && state_timer > 20 {	// If special button released...
             		window = 3;	// Switch to next attack window.
             		window_timer = 0;
